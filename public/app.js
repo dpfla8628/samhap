@@ -1,5 +1,6 @@
 import { compat, describeIlju, pillarsOf } from './lib/score.js';
-import { GAN, JI, GAN_HAN, JI_HAN, GAN_EL, JI_EL, ganji } from './lib/saju.js';
+import { GAN, JI, GAN_HAN, JI_HAN, GAN_EL, JI_EL, JI_ANIMAL, ganji } from './lib/saju.js';
+import { avatarSVG, drawAvatar } from './lib/avatars.js';
 import { MBTI_NAME, BLOOD_KEYWORD } from './lib/rules.js';
 
 const $app = document.getElementById('app');
@@ -15,6 +16,15 @@ const store = {
   get: (roomId) => { try { return JSON.parse(localStorage.getItem('samhap:' + roomId)) || {}; } catch { return {}; } },
   set: (roomId, v) => { try { localStorage.setItem('samhap:' + roomId, JSON.stringify(v)); } catch { /* 사생활 모드 등 */ } },
 };
+// 여러 방에 들어가도 정보를 다시 치지 않도록 프로필을, 다시 찾아갈 수 있도록 방 목록을 브라우저에 둔다.
+const profile = {
+  get: () => { try { return JSON.parse(localStorage.getItem('samhap:profile')) || null; } catch { return null; } },
+  set: (p) => { try { localStorage.setItem('samhap:profile', JSON.stringify(p)); } catch { /* 저장 불가 환경 */ } },
+};
+const myRooms = {
+  get: () => { try { return JSON.parse(localStorage.getItem('samhap:rooms')) || []; } catch { return []; } },
+  add: (id, name) => { const list = myRooms.get().filter((r) => r.id !== id); list.unshift({ id, name, at: Date.now() }); try { localStorage.setItem('samhap:rooms', JSON.stringify(list.slice(0, 30))); } catch { /* 저장 불가 환경 */ } },
+};
 let toastTimer;
 function toast(msg) {
   document.querySelector('.toast')?.remove();
@@ -22,6 +32,7 @@ function toast(msg) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.remove(), 2200);
 }
 
+const ROOM_FOOT = `<p class="footnote"><a href="/">다른 단톡방과도 해보고 싶다면 새 방을 여세요</a>. 한 사람이 여러 방에 들어가도 돼요.</p>`;
 const FOOT = `<p class="footnote">혈액형·MBTI·사주 궁합은 과학적 근거가 없는 재미용 풀이예요. 점수는 널리 퍼진 궁합표를 합쳐 만든 값입니다.</p>`;
 
 // ───────────────────────── 홈 ─────────────────────────
@@ -37,6 +48,8 @@ function renderHome() {
         <p class="error hidden"></p>
       </form>
     </section>
+    ${myRooms.get().length ? `<section class="sheet"><h3 style="margin-top:0;margin-bottom:4px">내가 들어간 방</h3><p class="muted small" style="margin-bottom:12px">이 브라우저에서 열거나 들어갔던 방이에요. 방은 몇 개든 열 수 있어요.</p>
+      <ul class="rooms">${myRooms.get().map((r) => `<li><a href="/r/${r.id}">${esc(r.name)}</a><span class="muted small">${new Date(r.at).toLocaleDateString('ko-KR')}</span></li>`).join('')}</ul></section>` : ''}
     <section class="sheet">
       <h3 style="margin-top:0;margin-bottom:16px">이렇게 돌아가요</h3>
       <ol class="steps">
@@ -53,6 +66,7 @@ function renderHome() {
     try {
       const { id } = await api('/api/rooms', 'POST', { name: f.name.value, size: +f.size.value });
       store.set(id, { owner: true });
+      myRooms.add(id, f.name.value.trim() || '이름 없는 방');
       location.assign('/r/' + id);
     } catch (ex) { err.textContent = ex.message; err.classList.remove('hidden'); btn.disabled = false; btn.textContent = '방 열고 링크 받기'; }
   });
@@ -126,6 +140,7 @@ async function loadRoom(id) {
   me = room.members.find((m) => m.id === saved.memberId) || null;
   if (!viewAs || !room.members.some((m) => m.id === viewAs)) viewAs = me?.id || null;
   document.title = `${room.name} — 삼합궁합`;
+  if (me) myRooms.add(id, room.name);
   renderRoom();
   clearInterval(pollTimer);
   pollTimer = setInterval(async () => { // ponytail: 20초 폴링. 실시간이 필요하면 Durable Object/WebSocket.
@@ -148,14 +163,16 @@ function renderRoom() {
       <div class="row"><span class="progress">${room.members.length}/${room.size}명 입력</span><button class="btn ghost" id="share">링크 공유</button></div>
     </header>`;
   if (!me) {
+    const remembered = profile.get();
     $app.innerHTML = head + `
-      <section class="sheet talisman"><h2>내 정보 넣기</h2>${memberForm()}</section>
+      <section class="sheet talisman"><h2>내 정보 넣기</h2>${remembered ? '<p class="muted small" style="margin:-8px 0 16px">지난번에 넣은 정보를 불러왔어요. 바뀐 게 있으면 고치고 저장하세요.</p>' : ''}${memberForm(remembered || {})}</section>
       ${room.members.length ? `<section class="sheet"><h3 style="margin-top:0">먼저 들어온 사람</h3><p>${room.members.map((m) => esc(m.name)).join(', ')}</p>
         <p class="muted small">입력 없이 구경만 하려면 <a href="#" id="peek">여기</a>를 눌러요.</p></section>` : ''}
-      ${FOOT}`;
+      ${FOOT}${ROOM_FOOT}`;
     bindForm($app, async (data) => {
       const res = await api(`/api/rooms/${roomId}/members`, 'POST', data);
       store.set(roomId, { ...store.get(roomId), memberId: res.memberId, token: res.token });
+      profile.set(data); myRooms.add(roomId, room.name);
       room = res.room; me = room.members.find((m) => m.id === res.memberId); viewAs = me.id; stamped = false;
       renderRoom();
     });
@@ -166,7 +183,7 @@ function renderRoom() {
     $app.innerHTML = head + `
       ${me.peek ? '<div class="notice"><span>구경 중이에요. 내 정보를 넣으면 나와의 궁합이 나와요.</span><button class="btn ghost small" id="join">내 정보 넣기</button></div>' : ''}
       <nav class="tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${tab === k}" data-tab="${k}">${l}</button>`).join('')}</nav>
-      <div id="panel" role="tabpanel"></div>${FOOT}`;
+      <div id="panel" role="tabpanel"></div>${FOOT}${ROOM_FOOT}`;
     $app.querySelector('#join')?.addEventListener('click', () => { me = null; viewAs = null; renderRoom(); });
     $app.querySelector('.tabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { tab = b.dataset.tab; renderRoom(); } });
     const panel = $app.querySelector('#panel');
@@ -193,6 +210,7 @@ function renderRank(panel, others) {
       ${perspective()}
       ${rows.length === 0 ? `<div class="empty"><h2>아직 ${esc(base.name)}님뿐이에요</h2><p class="muted">링크를 단톡방에 올리면 친구들이 들어와 순위가 생겨요.</p><button class="btn primary" id="shareEmpty">링크 공유</button></div>` : `
       <div class="best">
+        ${avatarSVG(pillarsOf(rows[0].m).day[1], 56)}
         <div><div class="label">${esc(base.name)}님과 가장 잘 맞는 사람</div><div class="name">${esc(rows[0].m.name)}</div><div class="sub">${rows[0].c.grade} · 혈액형 ${rows[0].c.blood.score} · MBTI ${rows[0].c.mbti.score} · 사주 ${rows[0].c.saju.score}</div></div>
         <span class="seal ${doStamp ? 'stamp' : ''}" aria-label="${rows[0].c.total}점">${rows[0].c.total}</span>
       </div>
@@ -202,7 +220,7 @@ function renderRank(panel, others) {
         <li><details>
           <summary>
             ${badge(i + 1)}
-            <span class="who"><b>${esc(m.name)}</b><span class="chips"><span class="chip">${m.blood}형</span><span class="chip">${m.mbti}</span><span class="chip">${ganji(pillarsOf(m).day)}일주</span></span></span>
+            <span class="who">${avatarSVG(pillarsOf(m).day[1], 36)}<span class="who-text"><b>${esc(m.name)}</b><span class="chips"><span class="chip">${m.blood}형</span><span class="chip">${m.mbti}</span><span class="chip">${ganji(pillarsOf(m).day)}일주</span></span></span></span>
             <span class="score"><b>${c.total}</b><span>${c.grade}</span></span>
             <span class="track"><i style="width:${c.total}%;animation-delay:${i * 60}ms"></i></span>
           </summary>
@@ -232,7 +250,7 @@ const badge = (n) => n <= 3
 // ───────────────────────── 유대 지도 ─────────────────────────
 function renderMap(panel) {
   const ms = room.members;
-  panel.innerHTML = `<section class="sheet" style="padding:12px">
+  panel.innerHTML = `<section class="sheet map">
     <canvas class="sky" id="sky" aria-label="방 전체 궁합 유대 지도"></canvas>
     <div class="legend">
       <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#b8331f" stroke-width="3"/></svg>75점 이상</span>
@@ -240,72 +258,136 @@ function renderMap(panel) {
       <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#8e8676" stroke-width="1"/></svg>45~59</span>
       <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#8e8676" stroke-width="1" stroke-dasharray="4 4"/></svg>45점 미만</span>
     </div>
-    <p class="muted small" style="margin:12px 0 0">별을 누르면 그 사람과 모두의 궁합이 보여요. 가까이 모일수록 잘 맞는 무리예요.</p>
-    <div id="pick"></div></section>`;
-  if (ms.length < 2) { panel.querySelector('#pick').innerHTML = '<p class="muted">두 명 이상 모이면 별자리가 그려져요.</p>'; }
+    <p class="muted small" style="margin:12px 0 0">캐릭터는 각자의 일지 동물이에요. 누르면 그 사람과 모두의 궁합이 보이고, 끌어서 옮길 수 있어요. 가까이 모일수록 잘 맞는 무리예요.</p>
+    <div id="pick">${ms.length < 2 ? '<p class="muted small">두 명 이상 모이면 별자리가 이어져요.</p>' : ''}</div></section>`;
   const canvas = panel.querySelector('#sky');
   const dpr = window.devicePixelRatio || 1;
   const W = canvas.clientWidth, H = canvas.clientHeight;
   canvas.width = W * dpr; canvas.height = H * dpr;
   const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ACCENT = '#b8331f', PAPER = '#f1ece2', DIM = '#8e8676', INK = '#17141d';
+  const FONT = (w) => `${w} 13px "Pretendard Variable", Pretendard, sans-serif`;
 
   const n = ms.length;
   const score = Array.from({ length: n }, () => new Array(n).fill(0));
   for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) score[i][j] = score[j][i] = compat(ms[i], ms[j]).total;
-  // 간단 힘-기반 배치: 모두 밀어내고, 궁합 높을수록 당긴다. ponytail: 동기 300회 반복, 60명까지 충분.
-  const nodes = ms.map((m, i) => ({ m, x: W / 2 + Math.cos(i / n * Math.PI * 2) * Math.min(W, H) * 0.32, y: H / 2 + Math.sin(i / n * Math.PI * 2) * Math.min(W, H) * 0.32 }));
-  for (let it = 0; it < 300 && n > 1; it++) {
-    const k = 1 - it / 300;
+  const R0 = Math.min(W, H) * 0.32;
+  const nodes = ms.map((m, i) => ({
+    m, ji: pillarsOf(m).day[1], phase: i * 1.7,
+    x: W / 2 + Math.cos(i / n * Math.PI * 2) * R0, y: H / 2 + Math.sin(i / n * Math.PI * 2) * R0,
+  }));
+  const PAD_X = 60, PAD_TOP = 34, PAD_BOT = 54;
+  let drag = null;
+  // 힘 기반 배치: 모두 밀어내고 궁합이 높을수록 당긴다. alpha가 열(온도) — 끌면 다시 데워진다.
+  function simulate(alpha) {
     for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
       const a = nodes[i], b = nodes[j];
       let dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d;
-      const want = 60 + (100 - score[i][j]) * 2.2; // 점수 높을수록 짧은 거리
-      const f = (d - want) * 0.02 * k;
-      a.x += dx * f; a.y += dy * f; b.x -= dx * f; b.y -= dy * f;
+      const want = (110 + (100 - score[i][j]) * 2.6) * Math.min(W, H) / 440;
+      const f = (d - want) * 0.02 * alpha;
+      if (a !== drag) { a.x += dx * f; a.y += dy * f; }
+      if (b !== drag) { b.x -= dx * f; b.y -= dy * f; }
     }
-    for (const p of nodes) { p.x = Math.min(W - 56, Math.max(56, p.x + (W / 2 - p.x) * 0.002)); p.y = Math.min(H - 44, Math.max(28, p.y + (H / 2 - p.y) * 0.002)); }
+    for (const p of nodes) {
+      if (p === drag) continue;
+      p.x = Math.min(W - PAD_X, Math.max(PAD_X, p.x + (W / 2 - p.x) * 0.002));
+      p.y = Math.min(H - PAD_BOT, Math.max(PAD_TOP, p.y + (H / 2 - p.y) * 0.002));
+    }
   }
-  const ACCENT = '#b8331f', PAPER = '#f1ece2', DIM = '#8e8676';
-  const color = (s) => s >= 75 ? ACCENT : DIM;
-  const FONT = '500 13px "Pretendard Variable", Pretendard, sans-serif';
-  function draw() {
+  for (let it = 0; it < 300 && n > 1; it++) simulate(1 - it / 300); // 첫 배치는 미리 식혀 둔다
+
+  const t0 = performance.now();
+  const ENTER = reduce ? 0 : 700, STAGGER = reduce ? 0 : 60;
+  let alpha = 0.04, selected = null, moved = false, raf = 0;
+  const ease = (p) => 1 - Math.pow(1 - p, 3);
+  const edgeStyle = (s) => s >= 75 ? [ACCENT, 3, []] : s >= 60 ? [DIM, 2, []] : s >= 45 ? [DIM, 1, []] : [DIM, 1, [4, 5]];
+
+  function draw(t) {
     ctx.clearRect(0, 0, W, H);
+    const el = t - t0;
+    const enterP = nodes.map((_, i) => ENTER ? Math.max(0, Math.min(1, (el - i * STAGGER) / ENTER)) : 1);
+    const pos = nodes.map((p, i) => {
+      const e = ease(enterP[i]);
+      const still = reduce || p === drag;
+      const fx = still ? 0 : Math.sin(t / 1100 + p.phase) * 1.6, fy = still ? 0 : Math.cos(t / 1300 + p.phase) * 1.6;
+      return { x: W / 2 + (p.x - W / 2) * e + fx, y: H / 2 + (p.y - H / 2) * e + fy, s: e };
+    });
     for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
-      const s = score[i][j], sel = selectedNode !== null && (i === selectedNode || j === selectedNode);
-      if (selectedNode !== null && !sel) continue;
-      ctx.strokeStyle = color(s);
-      ctx.globalAlpha = sel ? 1 : s >= 75 ? 0.9 : s >= 60 ? 0.7 : 0.45;
-      ctx.lineWidth = s >= 75 ? 3 : s >= 60 ? 2 : 1;
-      ctx.setLineDash(s < 45 ? [4, 5] : []);
-      ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
-      if (sel) { ctx.setLineDash([]); ctx.globalAlpha = 1; ctx.fillStyle = PAPER; ctx.font = FONT; ctx.textAlign = 'left'; ctx.fillText(String(s), (nodes[i].x + nodes[j].x) / 2 + 6, (nodes[i].y + nodes[j].y) / 2 - 6); }
+      const s = score[i][j], sel = selected !== null && (i === selected || j === selected);
+      const [color, width, dash] = edgeStyle(s);
+      const base = s >= 75 ? 0.9 : s >= 60 ? 0.7 : 0.45;
+      ctx.globalAlpha = Math.min(enterP[i], enterP[j]) * (selected === null ? base : sel ? 1 : 0.1);
+      ctx.strokeStyle = color; ctx.lineWidth = sel ? width + 1 : width;
+      ctx.setLineDash(dash);
+      if (sel && s >= 75) { ctx.shadowColor = ACCENT; ctx.shadowBlur = 10; }
+      ctx.beginPath(); ctx.moveTo(pos[i].x, pos[i].y); ctx.lineTo(pos[j].x, pos[j].y); ctx.stroke();
+      ctx.shadowBlur = 0;
+      if (s >= 75 && !reduce) { // 강한 인연: 굵은 선 위로 밝은 기운이 흐른다
+        ctx.strokeStyle = '#f3c9bf'; ctx.lineWidth = 2; ctx.setLineDash([5, 23]); ctx.lineDashOffset = -(t / (sel ? 10 : 28)) % 28;
+        ctx.beginPath(); ctx.moveTo(pos[i].x, pos[i].y); ctx.lineTo(pos[j].x, pos[j].y); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (sel) {
+        ctx.setLineDash([]); ctx.globalAlpha = 1; ctx.font = FONT(700); ctx.textAlign = 'center';
+        const mx = (pos[i].x + pos[j].x) / 2, my = (pos[i].y + pos[j].y) / 2;
+        ctx.lineWidth = 5; ctx.strokeStyle = INK; ctx.strokeText(String(s), mx, my + 4);
+        ctx.fillStyle = s >= 75 ? '#f0b7ab' : PAPER; ctx.fillText(String(s), mx, my + 4);
+      }
     }
     ctx.setLineDash([]); ctx.globalAlpha = 1;
     nodes.forEach((p, i) => {
-      const isSel = i === selectedNode, isMe = p.m.id === me?.id;
-      ctx.fillStyle = isMe ? ACCENT : PAPER;
-      star(ctx, p.x, p.y, isSel ? 10 : 7);
-      if (isSel) { ctx.strokeStyle = PAPER; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.stroke(); }
+      const isSel = i === selected, isMe = p.m.id === me?.id, q = pos[i];
+      const r = (isSel ? 27 : 22) * (0.4 + 0.6 * q.s);
+      ctx.globalAlpha = selected === null || isSel ? 1 : 0.35;
+      if (isSel) { ctx.shadowColor = ACCENT; ctx.shadowBlur = 24; }
+      drawAvatar(ctx, p.ji, q.x, q.y, r, { ring: isMe || isSel ? ACCENT : '#cfc6b5', ringWidth: isMe || isSel ? 3 : 1.5 });
+      ctx.shadowBlur = 0;
       const label = p.m.name + (isMe ? ' (나)' : '');
-      ctx.font = (isMe || isSel ? '700 ' : '500 ') + '13px "Pretendard Variable", Pretendard, sans-serif'; ctx.textAlign = 'center';
-      ctx.lineJoin = 'round'; ctx.lineWidth = 4; ctx.strokeStyle = '#17141d'; ctx.strokeText(label, p.x, p.y + 24); // 선 위에서도 읽히도록 후광
-      ctx.fillStyle = PAPER; ctx.fillText(label, p.x, p.y + 24);
+      ctx.font = FONT(isMe || isSel ? 700 : 500); ctx.textAlign = 'center'; ctx.lineJoin = 'round';
+      ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.strokeText(label, q.x, q.y + r + 16);
+      ctx.fillStyle = PAPER; ctx.fillText(label, q.x, q.y + r + 16);
     });
+    ctx.globalAlpha = 1;
   }
-  function star(c, x, y, r) { c.beginPath(); for (let k = 0; k < 8; k++) { const rr = k % 2 ? r * 0.45 : r, a = k / 8 * Math.PI * 2 - Math.PI / 2; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.closePath(); c.fill(); }
-  draw();
+  function frame(t) {
+    if (!document.body.contains(canvas)) return cancelAnimationFrame(raf);
+    if (!document.hidden) {
+      if (n > 1) simulate(alpha); alpha = Math.max(reduce ? 0 : 0.04, alpha * 0.96);
+      draw(t);
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+
+  const hit = (x, y) => { let best = null, bd = 30; nodes.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = i; } }); return best; };
+  const pt = (e) => { const r = canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
   canvas.addEventListener('pointerdown', (e) => {
-    const r = canvas.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-    let best = null, bd = 28;
-    nodes.forEach((p, i) => { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = i; } });
-    selectedNode = best === selectedNode ? null : best;
-    draw();
-    const pick = panel.querySelector('#pick');
-    if (selectedNode === null) { pick.innerHTML = ''; return; }
-    const m = ms[selectedNode];
-    const list = ms.map((o, j) => j === selectedNode ? null : [o, score[selectedNode][j]]).filter(Boolean).sort((a, b) => b[1] - a[1]);
-    pick.innerHTML = `<h3 style="margin-top:16px">${esc(m.name)}의 별자리</h3><p class="small" style="display:flex;gap:6px;flex-wrap:wrap">${list.map(([o, s]) => `<span class="chip" ${s >= 75 ? 'style="background:var(--accent-weak);color:var(--accent)"' : ''}>${esc(o.name)} <b>${s}</b></span>`).join('')}</p>`;
+    const [x, y] = pt(e); const i = hit(x, y); moved = false;
+    if (i === null) return;
+    drag = nodes[i]; canvas.setPointerCapture(e.pointerId); canvas.classList.add('dragging');
   });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const [x, y] = pt(e);
+    if (Math.hypot(x - drag.x, y - drag.y) > 3) moved = true;
+    drag.x = Math.min(W - PAD_X, Math.max(PAD_X, x)); drag.y = Math.min(H - PAD_BOT, Math.max(PAD_TOP, y)); alpha = 0.35;
+  });
+  const release = () => {
+    if (!drag) return;
+    const i = nodes.indexOf(drag);
+    if (!moved) { selected = selected === i ? null : i; showPick(); }
+    drag = null; canvas.classList.remove('dragging');
+  };
+  canvas.addEventListener('pointerup', release); canvas.addEventListener('pointercancel', release);
+  function showPick() {
+    const pick = panel.querySelector('#pick');
+    if (selected === null) { pick.innerHTML = ''; return; }
+    const m = ms[selected];
+    const list = ms.map((o, j) => j === selected ? null : [o, score[selected][j]]).filter(Boolean).sort((a, b) => b[1] - a[1]);
+    pick.innerHTML = `<div class="pick-head">${avatarSVG(nodes[selected].ji, 40)}<h3>${esc(m.name)}의 별자리 <span class="muted small">${JI_ANIMAL[nodes[selected].ji]} · ${ganji(pillarsOf(m).day)}일주</span></h3></div>
+      <p class="small pick-list">${list.map(([o, s]) => `<span class="chip" ${s >= 75 ? 'style="background:var(--accent-weak);color:var(--accent)"' : ''}>${esc(o.name)} <b>${s}</b></span>`).join('')}</p>`;
+  }
 }
 
 // ───────────────────────── 내 사주 ─────────────────────────
@@ -319,7 +401,7 @@ function renderMe(panel) {
   panel.innerHTML = `
     <section class="sheet talisman">
       ${perspective()}
-      <h2>${esc(target.name)}의 사주</h2>
+      <div class="me-head">${avatarSVG(p.day[1], 56)}<div><h2>${esc(target.name)}의 사주</h2><div class="muted small">일지가 ${JI[p.day[1]]}(${JI_HAN[p.day[1]]})라서 ${JI_ANIMAL[p.day[1]]} 캐릭터예요</div></div></div>
       <div class="pillars">${col('시주', p.hour)}${col('일주', p.day, true)}${col('월주', p.month)}${col('년주', p.year)}</div>
       <p class="muted small">${esc(target.birth)}${target.time ? ` ${esc(target.time)} (진태양시 ${esc(p.solarTime)})` : ' · 생시 모름'} · 입춘·절기 기준으로 세움</p>
       <h3>${d.ilju}일주</h3>
@@ -337,6 +419,7 @@ function renderMe(panel) {
     box.innerHTML = `<section class="sheet"><h2>내 정보 수정</h2>${memberForm(me)}</section>`;
     bindForm(box, async (data) => {
       room = await api(`/api/rooms/${roomId}/members/${me.id}`, 'PUT', { ...data, token: store.get(roomId).token });
+      profile.set(data);
       me = room.members.find((m) => m.id === me.id); stamped = false; toast('저장했어요'); renderRoom();
     });
     box.scrollIntoView({ behavior: 'smooth' });

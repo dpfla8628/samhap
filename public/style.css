@@ -121,7 +121,7 @@ select { width: auto; padding-right: 8px; }
 .tabs button[aria-selected=true] { color: var(--on-bg); border-bottom-color: var(--accent); }
 
 /* ── 베스트 매치(도장) ────────────────────────────────────── */
-.best { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: var(--r); background: var(--accent-weak); margin-bottom: 20px; }
+.best { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: var(--r); background: var(--accent-weak); margin-bottom: 20px; }
 .best .label { font-size: 13px; color: var(--text-2); margin-bottom: 2px; }
 .best .name { font-size: 20px; font-weight: 700; }
 .best .sub { font-size: 13px; color: var(--text-2); margin-top: 2px; }
@@ -148,7 +148,9 @@ select { width: auto; padding-right: 8px; }
 .rank .badge.top { background: transparent; }
 .rank .badge svg { width: 36px; height: 36px; display: block; }
 .rank .badge.r1 svg { color: var(--rank-1); } .rank .badge.r2 svg { color: var(--rank-2); } .rank .badge.r3 svg { color: var(--rank-3); }
-.rank .who { min-width: 0; }
+.rank .who { min-width: 0; display: flex; align-items: center; gap: 10px; }
+.rank .who-text { min-width: 0; }
+.avatar { flex: none; display: block; }
 .rank .who b { font-size: 16px; font-weight: 600; }
 .rank .chips { display: inline-flex; gap: 4px; flex-wrap: wrap; margin-left: 8px; vertical-align: middle; }
 .chip { font-size: 12px; padding: 2px 8px; border-radius: var(--r-pill); background: var(--surface-2); color: var(--text-2); white-space: nowrap; }
@@ -173,6 +175,10 @@ select { width: auto; padding-right: 8px; }
 .reasons .tag { flex: none; font-weight: 600; color: var(--text); }
 
 /* ── 내 사주 ─────────────────────────────────────────────── */
+.me-head { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+.me-head h2 { margin-bottom: 2px; }
+.me-head { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+.me-head h2 { margin-bottom: 2px; }
 .pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; margin: 12px 0 8px; }
 .pillar { border-radius: var(--r-sm); padding: 12px 4px 10px; background: #fff; border: 1px solid var(--line); }
 .pillar .lbl { font-size: 12px; color: var(--text-2); margin-bottom: 4px; }
@@ -186,7 +192,12 @@ select { width: auto; padding-right: 8px; }
 .el.zero { color: var(--text-2); opacity: .6; }
 
 /* ── 유대 지도 ───────────────────────────────────────────── */
-.sky { width: 100%; height: 380px; display: block; border-radius: var(--r-sm); background: var(--bg); touch-action: none; }
+.sheet.map { padding: 12px 12px 20px; }
+.sky { width: 100%; height: 440px; display: block; border-radius: var(--r-sm); background: var(--bg); touch-action: none; cursor: grab; }
+.sky.dragging { cursor: grabbing; }
+.pick-head { display: flex; align-items: center; gap: 10px; margin: 16px 0 8px; }
+.pick-head h3 { margin: 0; }
+.pick-list { display: flex; gap: 6px; flex-wrap: wrap; margin: 0; }
 .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--text-2); margin-top: 12px; }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
 
@@ -198,6 +209,12 @@ select { width: auto; padding-right: 8px; }
 .btn.small { height: 36px; padding: 0 14px; font-size: 14px; flex: none; }
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--surface); color: var(--text); padding: 12px 20px; border-radius: var(--r-sm); box-shadow: var(--shadow); font-size: 14px; z-index: 9; }
 .footnote { color: var(--on-bg-2); font-size: 12px; text-align: center; margin-top: 32px; line-height: 1.6; }
+.rooms { list-style: none; margin: 0; padding: 0; }
+.rooms li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.rooms li:first-child { border-top: 0; padding-top: 0; }
+.rooms a { font-weight: 600; text-decoration: none; }
+.rooms a:hover { text-decoration: underline; }
+.footnote a { color: var(--on-bg); }
 .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
 .steps li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; }
 .steps li i { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-weak); color: var(--accent); font-style: normal; font-weight: 700; display: grid; place-items: center; font-size: 13px; }
@@ -207,4 +224,6 @@ select { width: auto; padding-right: 8px; }
   .rank .detail { padding-left: 4px; }
   .rank .who b { font-size: 15px; }
   .rank .chips { display: flex; margin: 4px 0 0; }
+  .sky { height: 400px; }
+  .sky { height: 400px; }
 }
