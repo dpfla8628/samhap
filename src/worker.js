@@ -29,9 +29,31 @@ async function saveRoom(env, room) {
     .bind(room.id, JSON.stringify(room), Date.now()).run();
 }
 
+// 방 링크(/r/ID)는 index.html을 그대로 주되 OG 태그만 방 정보로 바꾼다 — 카톡·슬랙 미리보기에 방 이름이 뜨도록.
+const escAttr = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+async function roomPage(req, env, id, origin) {
+  const [room, page] = await Promise.all([loadRoom(env, id), env.ASSETS.fetch(new Request(origin + '/index.html'))]);
+  let html = await page.text();
+  if (room) {
+    const n = room.members.length;
+    const title = `${room.name} — 삼합궁합 초대장`;
+    const desc = n ? `${n}명이 들어왔어요. 혈액형·MBTI·사주를 합쳐 ${room.name}에서 나와 제일 잘 맞는 친구를 확인해 보세요.` : `혈액형·MBTI·사주를 합쳐 ${room.name} 친구들과의 궁합 순위를 봐요. 첫 번째로 들어가 보세요.`;
+    html = html
+      .replace(/<title>[^<]*<\/title>/, `<title>${escAttr(title)}</title>`)
+      .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${escAttr(title)}$2`)
+      .replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${escAttr(desc)}$2`)
+      .replace(/(<meta name="description" content=")[^"]*(")/, `$1${escAttr(desc)}$2`)
+      .replace('</head>', `<meta property="og:url" content="${origin}/r/${id}">
+</head>`);
+  }
+  return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache' } });
+}
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    const roomPath = url.pathname.match(/^\/r\/([a-z0-9]+)$/);
+    if (roomPath && req.method === 'GET') return roomPage(req, env, roomPath[1], url.origin);
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(req);
     const parts = url.pathname.split('/').filter(Boolean); // ['api','rooms',id,'members',mid]
     let body = {};

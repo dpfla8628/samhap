@@ -41,10 +41,12 @@ function renderHome() {
       </form>
     </section>
     <section class="sheet">
-      <h3 style="margin-top:0">이렇게 돌아가요</h3>
-      <p>1. 방을 열면 링크가 생겨요. 단톡방에 붙여넣으세요.</p>
-      <p>2. 들어온 사람마다 혈액형·MBTI·생년월일(생시)을 넣어요.</p>
-      <p>3. 생시로 사주 네 기둥을 세우고, 세 체계를 합쳐 나와 가장 잘 맞는 친구 순위가 나와요. 방 전체의 유대 지도도 볼 수 있어요.</p>
+      <h3 style="margin-top:0;margin-bottom:16px">이렇게 돌아가요</h3>
+      <ol class="steps">
+        <li><i>1</i><span>방을 열면 링크가 생겨요. 단톡방에 붙여넣으세요.</span></li>
+        <li><i>2</i><span>들어온 사람마다 혈액형·MBTI·생년월일(생시)을 넣어요.</span></li>
+        <li><i>3</i><span>세 체계를 합쳐 나와 가장 잘 맞는 친구 순위와 방 전체 유대 지도가 나와요.</span></li>
+      </ol>
     </section>
     ${FOOT}`;
   $app.querySelector('#create').addEventListener('submit', async (e) => {
@@ -54,7 +56,7 @@ function renderHome() {
     try {
       const { id } = await api('/api/rooms', 'POST', { name: f.name.value, size: +f.size.value });
       store.set(id, { owner: true });
-      location.hash = '#/r/' + id;
+      location.assign('/r/' + id);
     } catch (ex) { err.textContent = ex.message; err.classList.remove('hidden'); f.querySelector('button').disabled = false; }
   });
 }
@@ -72,7 +74,7 @@ function memberForm(init = {}) {
         <div class="tiles" id="blood">${['A', 'B', 'O', 'AB'].map((t) => `<button type="button" class="tile" aria-pressed="${init.blood === t}" data-v="${t}">${t}</button>`).join('')}</div></div>
       <div class="field"><span class="field-name">MBTI</span>
         <div class="seg-grid" id="mbti">${seg(0, 'E', 'I', '외향', '내향')}${seg(1, 'S', 'N', '감각', '직관')}${seg(2, 'T', 'F', '사고', '감정')}${seg(3, 'J', 'P', '판단', '인식')}</div>
-        <p class="mbti-preview" id="mbtiPreview">${mbti ? `${mbti} <small style="font-size:14px;letter-spacing:0">${MBTI_NAME[mbti] || ''}</small>` : '&nbsp;'}</p></div>
+        <p class="mbti-preview" id="mbtiPreview">${mbti ? `${mbti} <small>${MBTI_NAME[mbti] || ''}</small>` : '&nbsp;'}</p></div>
       <label class="field"><span>생년월일 (양력)</span><input type="date" name="birth" min="1900-01-01" max="2100-12-31" value="${esc(init.birth || '')}" required></label>
       <div class="field"><span class="field-name">태어난 시각</span>
         <div class="row"><input type="time" name="time" value="${esc(init.time || '')}" style="width:auto" ${init.time === null && init.birth ? 'disabled' : ''}>
@@ -93,7 +95,7 @@ function bindForm(root, onSubmit) {
     const b = e.target.closest('button'); if (!b) return;
     b.parentElement.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b));
     const v = readMbti(root);
-    preview.innerHTML = v.length === 4 ? `${v} <small style="font-size:14px;letter-spacing:0">${MBTI_NAME[v]}</small>` : (v || '&nbsp;');
+    preview.innerHTML = v.length === 4 ? `${v} <small>${MBTI_NAME[v]}</small>` : (v || '&nbsp;');
   });
   f.notime.addEventListener('change', () => { f.time.disabled = f.notime.checked; if (f.notime.checked) f.time.value = ''; });
   f.addEventListener('submit', async (e) => {
@@ -120,19 +122,19 @@ let room, roomId, me, tab = 'rank', viewAs = null, pollTimer, stamped = false, s
 async function loadRoom(id) {
   roomId = id;
   const saved = store.get(id);
-  try { room = await api('/api/rooms/' + id); } catch (ex) { $app.innerHTML = `<section class="sheet"><h2>방을 찾을 수 없어요</h2><p>${esc(ex.message)}</p><p><a href="#/">새 방 열기</a></p></section>`; return; }
+  try { room = await api('/api/rooms/' + id); } catch (ex) { $app.innerHTML = `<section class="sheet"><h2>방을 찾을 수 없어요</h2><p>${esc(ex.message)}</p><p><a href="/">새 방 열기</a></p></section>`; return; }
   me = room.members.find((m) => m.id === saved.memberId) || null;
   if (!viewAs || !room.members.some((m) => m.id === viewAs)) viewAs = me?.id || null;
   renderRoom();
   clearInterval(pollTimer);
   pollTimer = setInterval(async () => { // ponytail: 20초 폴링. 실시간이 필요하면 Durable Object/WebSocket.
-    if (document.hidden || location.hash !== '#/r/' + id) return;
+    if (document.hidden || roomId !== id) return;
     try { const fresh = await api('/api/rooms/' + id); if (JSON.stringify(fresh) !== JSON.stringify(room)) { room = fresh; me = room.members.find((m) => m.id === saved.memberId) || null; renderRoom(); } } catch { /* 잠시 후 재시도 */ }
   }, 20000);
 }
 
 function shareLink() {
-  const url = location.origin + '/#/r/' + roomId;
+  const url = location.origin + '/r/' + roomId;
   const text = `[삼합궁합] ${room.name} — 혈액형·MBTI·사주 합친 궁합 보기`;
   if (navigator.share) navigator.share({ title: '삼합궁합', text, url }).catch(() => {});
   else navigator.clipboard?.writeText(url).then(() => toast('링크를 복사했어요')).catch(() => prompt('링크를 복사하세요', url));
@@ -141,7 +143,7 @@ function shareLink() {
 function renderRoom() {
   const head = `
     <header class="roomhead">
-      <div><a href="#/" class="small" style="color:#c9bda0;text-decoration:none">三合 삼합궁합</a><h1>${esc(room.name)}</h1></div>
+      <div><a href="/" class="crumb">三合 삼합궁합</a><h1>${esc(room.name)}</h1></div>
       <div class="row"><span class="progress">${room.members.length}/${room.size}명 입력</span><button class="btn ghost" id="share">링크 공유</button></div>
     </header>`;
   if (!me) {
@@ -186,25 +188,29 @@ function renderRank(panel, others) {
     <section class="sheet">
       ${raw(perspective()).v}
       ${rows.length === 0 ? `<p class="muted">아직 다른 사람이 없어요. 링크를 공유해 친구를 불러오세요.</p>` : `
-      <h2 style="margin-bottom:6px">${esc(base.name)}님과 잘 맞는 순서</h2>
-      <p class="muted small">점수 = 혈액형 25% + MBTI 35% + 사주 40%. 항목을 누르면 이유가 펼쳐져요.</p>
+      <div class="best">
+        <div><div class="label">${esc(base.name)}님과 가장 잘 맞는 사람</div><div class="name">${esc(rows[0].m.name)}</div><div class="sub">${rows[0].c.grade} · 혈액형 ${rows[0].c.blood.score} / MBTI ${rows[0].c.mbti.score} / 사주 ${rows[0].c.saju.score}</div></div>
+        <span class="seal ${doStamp ? 'stamp' : ''}" aria-label="${rows[0].c.total}점">${rows[0].c.total}</span>
+      </div>
+      <h2 style="margin-bottom:4px">잘 맞는 순서</h2>
+      <p class="muted small" style="margin-bottom:8px">혈액형 25% + MBTI 35% + 사주 40%. 이름을 누르면 이유가 펼쳐져요.</p>
       <ol class="rank">${rows.map(({ m, c }, i) => `
         <li><details>
           <summary>
-            <span class="no">${i + 1}</span>
+            ${badge(i + 1)}
             <span class="who"><b>${esc(m.name)}</b><span class="chips"><span class="chip">${m.blood}형</span><span class="chip">${m.mbti}</span><span class="chip">${ganji(pillarsOf(m).day)}일주</span></span></span>
-            <span class="grade">${c.grade}</span>
-            <span class="seal ${doStamp ? 'stamp' : ''}" style="animation-delay:${i * 70}ms">${c.total}</span>
+            <span class="score"><b>${c.total}</b><span>${c.grade}</span></span>
+            <span class="track"><i style="width:${c.total}%;animation-delay:${i * 60}ms"></i></span>
           </summary>
           <div class="detail">
             <div class="bars">
               ${bar('blood', '혈액형', c.blood.score)}${bar('mbti', 'MBTI', c.mbti.score)}${bar('saju', '사주', c.saju.score)}
             </div>
             <ul class="reasons">
-              <li><b>혈액형 ${base.blood}·${m.blood}</b> — ${esc(c.blood.reason)}</li>
-              <li><b>MBTI ${base.mbti}·${m.mbti}</b> — ${esc(c.mbti.reason)}. ${esc(c.mbti.tier)}</li>
-              ${c.saju.reasons.slice(0, 6).map((r) => `<li class="${r.delta > 0 ? 'plus' : 'minus'}">${r.delta > 0 ? '+' : ''}${r.delta} ${esc(r.text)}</li>`).join('')}
-              ${c.saju.hourKnown ? '' : '<li class="muted">한쪽이 생시를 몰라 시주는 빼고 봤어요.</li>'}
+              <li><span class="tag">혈액형 ${base.blood}·${m.blood}</span><span>${esc(c.blood.reason)}</span></li>
+              <li><span class="tag">MBTI ${base.mbti}·${m.mbti}</span><span>${esc(c.mbti.reason)}. ${esc(c.mbti.tier)}</span></li>
+              ${c.saju.reasons.slice(0, 6).map((r) => `<li class="${r.delta > 0 ? 'plus' : 'minus'}"><span class="d">${r.delta > 0 ? '+' : ''}${r.delta}</span><span>${esc(r.text)}</span></li>`).join('')}
+              ${c.saju.hourKnown ? '' : '<li class="muted"><span class="d"></span><span>한쪽이 생시를 몰라 시주는 빼고 봤어요.</span></li>'}
             </ul>
           </div>
         </details></li>`).join('')}
@@ -213,14 +219,18 @@ function renderRank(panel, others) {
   panel.querySelector('#viewAs').addEventListener('change', (e) => { viewAs = e.target.value; stamped = false; renderRoom(); });
 }
 const bar = (cls, label, v) => `<div class="bar ${cls}"><span>${label}</span><i><b style="width:${v}%"></b></i><span>${v}</span></div>`;
+const CROWN = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 18h18v2H3v-2zm0-2 1.2-9 4.8 4 3-6 3 6 4.8-4L21 16H3z"/></svg>`;
+const badge = (n) => n <= 3
+  ? `<span class="badge top r${n}" aria-label="${n}위">${CROWN}</span>`
+  : `<span class="badge" aria-label="${n}위">${n}</span>`;
 
 // ───────────────────────── 유대 지도 ─────────────────────────
 function renderMap(panel) {
   const ms = room.members;
   panel.innerHTML = `<section class="sheet" style="padding:12px">
     <canvas class="sky" id="sky" aria-label="방 전체 궁합 유대 지도"></canvas>
-    <div class="legend"><span><i style="background:#f0c75e"></i>75점 이상</span><span><i style="background:#8fb0e0"></i>60~74</span><span><i style="background:#6b6478"></i>45~59</span><span><i style="background:#b7321d"></i>45점 미만</span></div>
-    <p class="muted small" style="margin:8px 0 0">별을 누르면 그 사람과 모두의 궁합이 보여요. 가까이 모일수록 잘 맞는 무리예요.</p>
+    <div class="legend"><span><i></i>75점 이상</span><span><i class="mid"></i>60~74</span><span><i class="low"></i>45~59</span><span><i class="bad"></i>45점 미만</span></div>
+    <p class="muted small" style="margin:12px 0 0">별을 누르면 그 사람과 모두의 궁합이 보여요. 가까이 모일수록 잘 맞는 무리예요.</p>
     <div id="pick"></div></section>`;
   if (ms.length < 2) { panel.querySelector('#pick').innerHTML = '<p class="muted">두 명 이상 모이면 별자리가 그려져요.</p>'; }
   const canvas = panel.querySelector('#sky');
@@ -245,23 +255,29 @@ function renderMap(panel) {
     }
     for (const p of nodes) { p.x = Math.min(W - 40, Math.max(40, p.x + (W / 2 - p.x) * 0.002)); p.y = Math.min(H - 30, Math.max(30, p.y + (H / 2 - p.y) * 0.002)); }
   }
-  const color = (s) => s >= 75 ? '#f0c75e' : s >= 60 ? '#8fb0e0' : s >= 45 ? '#6b6478' : '#b7321d';
+  const ACCENT = '#b8331f', PAPER = '#f1ece2', DIM = '#8e8676';
+  const color = (s) => s >= 75 ? ACCENT : DIM;
+  const FONT = '500 13px "Pretendard Variable", Pretendard, sans-serif';
   function draw() {
     ctx.clearRect(0, 0, W, H);
     for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
       const s = score[i][j], sel = selectedNode !== null && (i === selectedNode || j === selectedNode);
       if (selectedNode !== null && !sel) continue;
-      ctx.strokeStyle = color(s); ctx.globalAlpha = sel ? 0.95 : 0.25 + (s / 100) * 0.5; ctx.lineWidth = sel ? 2.5 : 0.8 + (s / 100) * 2;
+      ctx.strokeStyle = color(s);
+      ctx.globalAlpha = sel ? 1 : s >= 75 ? 0.9 : s >= 60 ? 0.7 : 0.45;
+      ctx.lineWidth = s >= 75 ? 3 : s >= 60 ? 2 : 1;
+      ctx.setLineDash(s < 45 ? [4, 5] : []);
       ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
-      if (sel) { ctx.globalAlpha = 1; ctx.fillStyle = '#f2e8cf'; ctx.font = '12px Gowun Batang, serif'; ctx.fillText(String(s), (nodes[i].x + nodes[j].x) / 2 + 4, (nodes[i].y + nodes[j].y) / 2 - 4); }
+      if (sel) { ctx.setLineDash([]); ctx.globalAlpha = 1; ctx.fillStyle = PAPER; ctx.font = FONT; ctx.textAlign = 'left'; ctx.fillText(String(s), (nodes[i].x + nodes[j].x) / 2 + 6, (nodes[i].y + nodes[j].y) / 2 - 6); }
     }
-    ctx.globalAlpha = 1;
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
     nodes.forEach((p, i) => {
       const isSel = i === selectedNode, isMe = p.m.id === me?.id;
-      ctx.fillStyle = isSel ? '#fff4c2' : isMe ? '#f0c75e' : '#e8dcc0';
-      star(ctx, p.x, p.y, isSel ? 9 : 6);
-      ctx.fillStyle = '#f2e8cf'; ctx.font = `${isMe || isSel ? 'bold ' : ''}13px Gowun Batang, serif`; ctx.textAlign = 'center';
-      ctx.fillText(p.m.name, p.x, p.y + 20);
+      ctx.fillStyle = isMe ? ACCENT : PAPER;
+      star(ctx, p.x, p.y, isSel ? 10 : 7);
+      if (isSel) { ctx.strokeStyle = PAPER; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.stroke(); }
+      ctx.fillStyle = PAPER; ctx.font = (isMe || isSel ? '700 ' : '500 ') + '13px "Pretendard Variable", Pretendard, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(p.m.name + (isMe ? ' (나)' : ''), p.x, p.y + 24);
     });
   }
   function star(c, x, y, r) { c.beginPath(); for (let k = 0; k < 8; k++) { const rr = k % 2 ? r * 0.45 : r, a = k / 8 * Math.PI * 2 - Math.PI / 2; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.closePath(); c.fill(); }
@@ -276,7 +292,7 @@ function renderMap(panel) {
     if (selectedNode === null) { pick.innerHTML = ''; return; }
     const m = ms[selectedNode];
     const list = ms.map((o, j) => j === selectedNode ? null : [o, score[selectedNode][j]]).filter(Boolean).sort((a, b) => b[1] - a[1]);
-    pick.innerHTML = `<h3>${esc(m.name)}의 별자리</h3><p class="small">${list.map(([o, s]) => `<span class="chip" style="color:${color(s)};border-color:${color(s)}">${esc(o.name)} ${s}</span>`).join(' ')}</p>`;
+    pick.innerHTML = `<h3 style="margin-top:16px">${esc(m.name)}의 별자리</h3><p class="small" style="display:flex;gap:6px;flex-wrap:wrap">${list.map(([o, s]) => `<span class="chip" ${s >= 75 ? 'style="background:var(--accent-weak);color:var(--accent)"' : ''}>${esc(o.name)} <b>${s}</b></span>`).join('')}</p>`;
   });
 }
 
@@ -285,7 +301,7 @@ function renderMe(panel) {
   const target = room.members.find((m) => m.id === viewAs) || room.members[0];
   const p = pillarsOf(target), d = describeIlju(target);
   const col = (label, pl, isDay) => pl
-    ? `<div class="pillar"><div class="lbl">${label}</div><div class="han ${isDay ? 'day' : ''}">${GAN_HAN[pl[0]]}<br>${JI_HAN[pl[1]]}</div><div class="kor">${GAN[pl[0]]}${JI[pl[1]]} · ${GAN_EL[pl[0]]}${JI_EL[pl[1]]}</div></div>`
+    ? `<div class="pillar ${isDay ? 'day' : ''}"><div class="lbl">${label}</div><div class="han ${isDay ? 'day' : ''}">${GAN_HAN[pl[0]]}<br>${JI_HAN[pl[1]]}</div><div class="kor">${GAN[pl[0]]}${JI[pl[1]]} · ${GAN_EL[pl[0]]}${JI_EL[pl[1]]}</div></div>`
     : `<div class="pillar"><div class="lbl">${label}</div><div class="han muted">?<br>?</div><div class="kor muted">생시 모름</div></div>`;
   const mine = target.id === me?.id;
   panel.innerHTML = `
@@ -296,7 +312,7 @@ function renderMe(panel) {
       <p class="muted small">${esc(target.birth)}${target.time ? ` ${esc(target.time)} (진태양시 ${esc(p.solarTime)})` : ' · 생시 모름'} · 입춘·절기 기준으로 세움</p>
       <h3>${d.ilju}일주</h3>
       <p>${esc(d.text)}</p>
-      <div class="elements">${Object.entries(p.elements).map(([e, c]) => `<span class="el ${e}">${e} ${c}</span>`).join('')}</div>
+      <div class="elements">${Object.entries(p.elements).map(([e, c]) => `<span class="el ${c ? '' : 'zero'}">${e}<b>${c}</b></span>`).join('')}</div>
       <h3>혈액형 · MBTI</h3>
       <p>${target.blood}형 — ${BLOOD_KEYWORD[target.blood]}<br>${target.mbti} — ${MBTI_NAME[target.mbti]}</p>
       ${mine ? `<div class="row" style="margin-top:16px"><button class="btn ghost" id="edit">내 정보 수정</button><button class="btn ghost" id="del">내 정보 삭제</button></div>` : ''}
@@ -324,7 +340,7 @@ const pillarCacheBust = () => {}; // 생년월일이 바뀌면 키가 달라지�
 // ───────────────────────── 라우터 ─────────────────────────
 function route() {
   clearInterval(pollTimer); selectedNode = null;
-  const m = location.hash.match(/^#\/r\/([a-z0-9]+)/);
+  const m = location.pathname.match(/^\/r\/([a-z0-9]+)/) || location.hash.match(/^#\/r\/([a-z0-9]+)/);
   if (m) loadRoom(m[1]); else renderHome();
 }
 window.addEventListener('hashchange', route);
