@@ -88,7 +88,7 @@ function memberForm(init = {}) {
         <p class="mbti-preview" id="mbtiPreview">${mbti ? `${mbti} <small>${MBTI_NAME[mbti] || ''}</small>` : '&nbsp;'}</p></div>
       <label class="field"><span>생년월일 (양력)</span><input type="date" name="birth" min="1900-01-01" max="2100-12-31" value="${esc(init.birth || '')}" required></label>
       <div class="field"><span class="field-name">태어난 시각</span>
-        <div class="row"><input type="time" name="time" value="${esc(init.time || '')}" style="width:auto" ${init.time === null && init.birth ? 'disabled' : ''}>
+        <div class="row"><input type="time" name="time" class="time" value="${esc(init.time || '')}" ${init.time === null && init.birth ? 'disabled' : ''}>
         <label class="check"><input type="checkbox" name="notime" ${init.time === null && init.birth ? 'checked' : ''}> 몰라요</label></div>
         <p class="muted small" style="margin-top:6px">시각을 알면 시주까지 네 기둥, 모르면 세 기둥으로 봐요.</p></div>
       <button class="btn primary block" type="submit">${init.id ? '수정 저장' : '궁합 보기'}</button>
