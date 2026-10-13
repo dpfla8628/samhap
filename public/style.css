@@ -62,7 +62,7 @@ button, input, select { font: inherit; color: inherit; }
 /* ── 폼 ──────────────────────────────────────────────────── */
 label.field { display: block; margin: 0 0 20px; }
 .field { margin: 0 0 20px; }
-label.field > span, .field-name { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--text); }
+label.field > span:first-child, .field-name { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--text); }
 input[type=text], input[type=date], input[type=time], input[type=number], select {
   width: 100%; height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r-sm); background: #fff; color: var(--text);
   transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
