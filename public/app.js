@@ -32,7 +32,6 @@ function toast(msg) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.remove(), 2200);
 }
 
-const ROOM_FOOT = `<p class="footnote"><a href="/">다른 단톡방과도 해보고 싶다면 새 방을 여세요</a>. 한 사람이 여러 방에 들어가도 돼요.</p>`;
 const FOOT = `<p class="footnote">혈액형·MBTI·사주 궁합은 과학적 근거가 없는 재미용 풀이예요. 점수는 널리 퍼진 궁합표를 합쳐 만든 값입니다.</p>`;
 
 // ───────────────────────── 홈 ─────────────────────────
@@ -159,8 +158,8 @@ function shareLink() {
 function renderRoom() {
   const head = `
     <header class="roomhead">
-      <div><a href="/" class="crumb">三合 삼합궁합</a><h1>${esc(room.name)}</h1></div>
-      <div class="row"><span class="progress">${room.members.length}/${room.size}명 입력</span><button class="btn ghost" id="share">링크 공유</button></div>
+      <div><a href="/" class="crumb">三合 삼합궁합</a><h1>${esc(room.name)}</h1><span class="progress">${room.members.length}/${room.size}명 입력</span></div>
+      <div class="actions"><a class="btn ghost" href="/">새 방 만들기</a><button class="btn primary" id="share">링크 공유</button></div>
     </header>`;
   if (!me) {
     const remembered = profile.get();
@@ -168,7 +167,7 @@ function renderRoom() {
       <section class="sheet talisman"><h2>내 정보 넣기</h2>${remembered ? '<p class="muted small" style="margin:-8px 0 16px">지난번에 넣은 정보를 불러왔어요. 바뀐 게 있으면 고치고 저장하세요.</p>' : ''}${memberForm(remembered || {})}</section>
       ${room.members.length ? `<section class="sheet"><h3 style="margin-top:0">먼저 들어온 사람</h3><p>${room.members.map((m) => esc(m.name)).join(', ')}</p>
         <p class="muted small">입력 없이 구경만 하려면 <a href="#" id="peek">여기</a>를 눌러요.</p></section>` : ''}
-      ${FOOT}${ROOM_FOOT}`;
+      ${FOOT}`;
     bindForm($app, async (data) => {
       const res = await api(`/api/rooms/${roomId}/members`, 'POST', data);
       store.set(roomId, { ...store.get(roomId), memberId: res.memberId, token: res.token });
@@ -183,7 +182,7 @@ function renderRoom() {
     $app.innerHTML = head + `
       ${me.peek ? '<div class="notice"><span>구경 중이에요. 내 정보를 넣으면 나와의 궁합이 나와요.</span><button class="btn ghost small" id="join">내 정보 넣기</button></div>' : ''}
       <nav class="tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${tab === k}" data-tab="${k}">${l}</button>`).join('')}</nav>
-      <div id="panel" role="tabpanel"></div>${FOOT}${ROOM_FOOT}`;
+      <div id="panel" role="tabpanel"></div>${FOOT}`;
     $app.querySelector('#join')?.addEventListener('click', () => { me = null; viewAs = null; renderRoom(); });
     $app.querySelector('.tabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { tab = b.dataset.tab; renderRoom(); } });
     const panel = $app.querySelector('#panel');
