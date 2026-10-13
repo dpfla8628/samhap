@@ -4,9 +4,6 @@ import { MBTI_NAME, BLOOD_KEYWORD } from './lib/rules.js';
 
 const $app = document.getElementById('app');
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const h = (strings, ...vals) => strings.reduce((out, s, i) => out + s + (i < vals.length ? (vals[i] instanceof Raw ? vals[i].v : esc(vals[i])) : ''), '');
-class Raw { constructor(v) { this.v = v; } }
-const raw = (v) => new Raw(v);
 
 async function api(path, method = 'GET', body) {
   const res = await fetch(path, { method, headers: body ? { 'content-type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
@@ -21,7 +18,7 @@ const store = {
 let toastTimer;
 function toast(msg) {
   document.querySelector('.toast')?.remove();
-  const el = document.createElement('div'); el.className = 'toast'; el.textContent = msg; document.body.appendChild(el);
+  const el = document.createElement('div'); el.className = 'toast'; el.setAttribute('role', 'status'); el.textContent = msg; document.body.appendChild(el);
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.remove(), 2200);
 }
 
@@ -52,12 +49,12 @@ function renderHome() {
   $app.querySelector('#create').addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = e.target, err = f.querySelector('.error');
-    f.querySelector('button').disabled = true;
+    const btn = f.querySelector('button'); btn.disabled = true; btn.textContent = '방 여는 중…';
     try {
       const { id } = await api('/api/rooms', 'POST', { name: f.name.value, size: +f.size.value });
       store.set(id, { owner: true });
       location.assign('/r/' + id);
-    } catch (ex) { err.textContent = ex.message; err.classList.remove('hidden'); f.querySelector('button').disabled = false; }
+    } catch (ex) { err.textContent = ex.message; err.classList.remove('hidden'); btn.disabled = false; btn.textContent = '방 열고 링크 받기'; }
   });
 }
 
@@ -68,12 +65,12 @@ function memberForm(init = {}) {
       <button type="button" aria-pressed="${mbti[i] === a}" data-v="${a}">${a}<small>${la}</small></button>
       <button type="button" aria-pressed="${mbti[i] === b}" data-v="${b}">${b}<small>${lb}</small></button></div>`;
   return `
-    <form id="member" autocomplete="off">
+    <form id="member" autocomplete="off" novalidate>
       <label class="field"><span>이름 (방에서 부르는 이름)</span><input type="text" name="name" maxlength="12" value="${esc(init.name || '')}" required></label>
       <div class="field"><span class="field-name">혈액형</span>
-        <div class="tiles" id="blood">${['A', 'B', 'O', 'AB'].map((t) => `<button type="button" class="tile" aria-pressed="${init.blood === t}" data-v="${t}">${t}</button>`).join('')}</div></div>
+        <div class="tiles" id="blood" role="group" aria-label="혈액형">${['A', 'B', 'O', 'AB'].map((t) => `<button type="button" class="tile" aria-pressed="${init.blood === t}" data-v="${t}">${t}</button>`).join('')}</div></div>
       <div class="field"><span class="field-name">MBTI</span>
-        <div class="seg-grid" id="mbti">${seg(0, 'E', 'I', '외향', '내향')}${seg(1, 'S', 'N', '감각', '직관')}${seg(2, 'T', 'F', '사고', '감정')}${seg(3, 'J', 'P', '판단', '인식')}</div>
+        <div class="seg-grid" id="mbti" role="group" aria-label="MBTI">${seg(0, 'E', 'I', '외향', '내향')}${seg(1, 'S', 'N', '감각', '직관')}${seg(2, 'T', 'F', '사고', '감정')}${seg(3, 'J', 'P', '판단', '인식')}</div>
         <p class="mbti-preview" id="mbtiPreview">${mbti ? `${mbti} <small>${MBTI_NAME[mbti] || ''}</small>` : '&nbsp;'}</p></div>
       <label class="field"><span>생년월일 (양력)</span><input type="date" name="birth" min="1900-01-01" max="2100-12-31" value="${esc(init.birth || '')}" required></label>
       <div class="field"><span class="field-name">태어난 시각</span>
@@ -105,16 +102,18 @@ function bindForm(root, onSubmit) {
       name: f.name.value.trim(), blood: root.querySelector('#blood [aria-pressed=true]')?.dataset.v,
       mbti: readMbti(root), birth: f.birth.value, time: f.notime.checked ? null : f.time.value || null,
     };
+    if (!data.name) return showErr(err, '이름을 넣어주세요');
     if (!data.blood) return showErr(err, '혈액형을 골라주세요');
     if (data.mbti.length !== 4) return showErr(err, 'MBTI 네 글자를 모두 골라주세요');
     if (!data.birth) return showErr(err, '생년월일을 넣어주세요');
     if (!f.notime.checked && !data.time) return showErr(err, '태어난 시각을 넣거나 "몰라요"를 체크하세요');
-    f.querySelector('button[type=submit]').disabled = true;
-    try { await onSubmit(data); } catch (ex) { showErr(err, ex.message); f.querySelector('button[type=submit]').disabled = false; }
+    const btn = f.querySelector('button[type=submit]'), label = btn.textContent;
+    btn.disabled = true; btn.textContent = '사주 세우는 중…';
+    try { await onSubmit(data); } catch (ex) { showErr(err, ex.message); err.scrollIntoView({ block: 'nearest' }); btn.disabled = false; btn.textContent = label; }
   });
 }
 const readMbti = (root) => [0, 1, 2, 3].map((i) => root.querySelector(`#mbti .seg[data-i="${i}"] [aria-pressed=true]`)?.dataset.v || '').join('');
-const showErr = (el, msg) => { el.textContent = msg; el.classList.remove('hidden'); };
+const showErr = (el, msg) => { el.textContent = msg; el.classList.remove('hidden'); el.scrollIntoView({ block: 'nearest' }); };
 
 // ───────────────────────── 방 ─────────────────────────
 let room, roomId, me, tab = 'rank', viewAs = null, pollTimer, stamped = false, selectedNode = null;
@@ -122,9 +121,11 @@ let room, roomId, me, tab = 'rank', viewAs = null, pollTimer, stamped = false, s
 async function loadRoom(id) {
   roomId = id;
   const saved = store.get(id);
-  try { room = await api('/api/rooms/' + id); } catch (ex) { $app.innerHTML = `<section class="sheet"><h2>방을 찾을 수 없어요</h2><p>${esc(ex.message)}</p><p><a href="/">새 방 열기</a></p></section>`; return; }
+  $app.innerHTML = '<p class="loading">방을 불러오는 중…</p>';
+  try { room = await api('/api/rooms/' + id); } catch (ex) { $app.innerHTML = `<section class="sheet"><h2>방을 찾을 수 없어요</h2><p>링크가 틀렸거나 방이 지워졌어요. 공유받은 링크를 다시 확인해 주세요.</p><p><a href="/">새 방 열기</a></p></section>`; return; }
   me = room.members.find((m) => m.id === saved.memberId) || null;
   if (!viewAs || !room.members.some((m) => m.id === viewAs)) viewAs = me?.id || null;
+  document.title = `${room.name} — 삼합궁합`;
   renderRoom();
   clearInterval(pollTimer);
   pollTimer = setInterval(async () => { // ponytail: 20초 폴링. 실시간이 필요하면 Durable Object/WebSocket.
@@ -163,8 +164,10 @@ function renderRoom() {
     const others = room.members.filter((m) => m.id !== viewAs);
     const tabs = [['rank', '궁합 순위'], ['map', '유대 지도'], ['me', me.peek ? '사주 보기' : '내 사주']];
     $app.innerHTML = head + `
+      ${me.peek ? '<div class="notice"><span>구경 중이에요. 내 정보를 넣으면 나와의 궁합이 나와요.</span><button class="btn ghost small" id="join">내 정보 넣기</button></div>' : ''}
       <nav class="tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${tab === k}" data-tab="${k}">${l}</button>`).join('')}</nav>
-      <div id="panel"></div>${FOOT}`;
+      <div id="panel" role="tabpanel"></div>${FOOT}`;
+    $app.querySelector('#join')?.addEventListener('click', () => { me = null; viewAs = null; renderRoom(); });
     $app.querySelector('.tabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { tab = b.dataset.tab; renderRoom(); } });
     const panel = $app.querySelector('#panel');
     if (tab === 'rank') renderRank(panel, others);
@@ -175,6 +178,7 @@ function renderRoom() {
 }
 
 function perspective() {
+  if (room.members.length < 2) return '';
   const sel = `<label class="row" style="margin-bottom:12px"><span>기준:</span><select id="viewAs" style="width:auto">${room.members.map((m) => `<option value="${m.id}" ${m.id === viewAs ? 'selected' : ''}>${esc(m.name)}${m.id === me?.id ? ' (나)' : ''}</option>`).join('')}</select></label>`;
   return sel;
 }
@@ -186,10 +190,10 @@ function renderRank(panel, others) {
   const doStamp = !stamped; stamped = true;
   panel.innerHTML = `
     <section class="sheet">
-      ${raw(perspective()).v}
-      ${rows.length === 0 ? `<p class="muted">아직 다른 사람이 없어요. 링크를 공유해 친구를 불러오세요.</p>` : `
+      ${perspective()}
+      ${rows.length === 0 ? `<div class="empty"><h2>아직 ${esc(base.name)}님뿐이에요</h2><p class="muted">링크를 단톡방에 올리면 친구들이 들어와 순위가 생겨요.</p><button class="btn primary" id="shareEmpty">링크 공유</button></div>` : `
       <div class="best">
-        <div><div class="label">${esc(base.name)}님과 가장 잘 맞는 사람</div><div class="name">${esc(rows[0].m.name)}</div><div class="sub">${rows[0].c.grade} · 혈액형 ${rows[0].c.blood.score} / MBTI ${rows[0].c.mbti.score} / 사주 ${rows[0].c.saju.score}</div></div>
+        <div><div class="label">${esc(base.name)}님과 가장 잘 맞는 사람</div><div class="name">${esc(rows[0].m.name)}</div><div class="sub">${rows[0].c.grade} · 혈액형 ${rows[0].c.blood.score} · MBTI ${rows[0].c.mbti.score} · 사주 ${rows[0].c.saju.score}</div></div>
         <span class="seal ${doStamp ? 'stamp' : ''}" aria-label="${rows[0].c.total}점">${rows[0].c.total}</span>
       </div>
       <h2 style="margin-bottom:4px">잘 맞는 순서</h2>
@@ -216,7 +220,8 @@ function renderRank(panel, others) {
         </details></li>`).join('')}
       </ol>`}
     </section>`;
-  panel.querySelector('#viewAs').addEventListener('change', (e) => { viewAs = e.target.value; stamped = false; renderRoom(); });
+  panel.querySelector('#viewAs')?.addEventListener('change', (e) => { viewAs = e.target.value; stamped = false; renderRoom(); });
+  panel.querySelector('#shareEmpty')?.addEventListener('click', shareLink);
 }
 const bar = (cls, label, v) => `<div class="bar ${cls}"><span>${label}</span><i><b style="width:${v}%"></b></i><span>${v}</span></div>`;
 const CROWN = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 18h18v2H3v-2zm0-2 1.2-9 4.8 4 3-6 3 6 4.8-4L21 16H3z"/></svg>`;
@@ -229,7 +234,12 @@ function renderMap(panel) {
   const ms = room.members;
   panel.innerHTML = `<section class="sheet" style="padding:12px">
     <canvas class="sky" id="sky" aria-label="방 전체 궁합 유대 지도"></canvas>
-    <div class="legend"><span><i></i>75점 이상</span><span><i class="mid"></i>60~74</span><span><i class="low"></i>45~59</span><span><i class="bad"></i>45점 미만</span></div>
+    <div class="legend">
+      <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#b8331f" stroke-width="3"/></svg>75점 이상</span>
+      <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#8e8676" stroke-width="2"/></svg>60~74</span>
+      <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#8e8676" stroke-width="1"/></svg>45~59</span>
+      <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#8e8676" stroke-width="1" stroke-dasharray="4 4"/></svg>45점 미만</span>
+    </div>
     <p class="muted small" style="margin:12px 0 0">별을 누르면 그 사람과 모두의 궁합이 보여요. 가까이 모일수록 잘 맞는 무리예요.</p>
     <div id="pick"></div></section>`;
   if (ms.length < 2) { panel.querySelector('#pick').innerHTML = '<p class="muted">두 명 이상 모이면 별자리가 그려져요.</p>'; }
@@ -253,7 +263,7 @@ function renderMap(panel) {
       const f = (d - want) * 0.02 * k;
       a.x += dx * f; a.y += dy * f; b.x -= dx * f; b.y -= dy * f;
     }
-    for (const p of nodes) { p.x = Math.min(W - 40, Math.max(40, p.x + (W / 2 - p.x) * 0.002)); p.y = Math.min(H - 30, Math.max(30, p.y + (H / 2 - p.y) * 0.002)); }
+    for (const p of nodes) { p.x = Math.min(W - 56, Math.max(56, p.x + (W / 2 - p.x) * 0.002)); p.y = Math.min(H - 44, Math.max(28, p.y + (H / 2 - p.y) * 0.002)); }
   }
   const ACCENT = '#b8331f', PAPER = '#f1ece2', DIM = '#8e8676';
   const color = (s) => s >= 75 ? ACCENT : DIM;
@@ -276,8 +286,10 @@ function renderMap(panel) {
       ctx.fillStyle = isMe ? ACCENT : PAPER;
       star(ctx, p.x, p.y, isSel ? 10 : 7);
       if (isSel) { ctx.strokeStyle = PAPER; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(p.x, p.y, 15, 0, Math.PI * 2); ctx.stroke(); }
-      ctx.fillStyle = PAPER; ctx.font = (isMe || isSel ? '700 ' : '500 ') + '13px "Pretendard Variable", Pretendard, sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText(p.m.name + (isMe ? ' (나)' : ''), p.x, p.y + 24);
+      const label = p.m.name + (isMe ? ' (나)' : '');
+      ctx.font = (isMe || isSel ? '700 ' : '500 ') + '13px "Pretendard Variable", Pretendard, sans-serif'; ctx.textAlign = 'center';
+      ctx.lineJoin = 'round'; ctx.lineWidth = 4; ctx.strokeStyle = '#17141d'; ctx.strokeText(label, p.x, p.y + 24); // 선 위에서도 읽히도록 후광
+      ctx.fillStyle = PAPER; ctx.fillText(label, p.x, p.y + 24);
     });
   }
   function star(c, x, y, r) { c.beginPath(); for (let k = 0; k < 8; k++) { const rr = k % 2 ? r * 0.45 : r, a = k / 8 * Math.PI * 2 - Math.PI / 2; c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.closePath(); c.fill(); }
@@ -306,7 +318,7 @@ function renderMe(panel) {
   const mine = target.id === me?.id;
   panel.innerHTML = `
     <section class="sheet talisman">
-      ${raw(perspective()).v}
+      ${perspective()}
       <h2>${esc(target.name)}의 사주</h2>
       <div class="pillars">${col('시주', p.hour)}${col('일주', p.day, true)}${col('월주', p.month)}${col('년주', p.year)}</div>
       <p class="muted small">${esc(target.birth)}${target.time ? ` ${esc(target.time)} (진태양시 ${esc(p.solarTime)})` : ' · 생시 모름'} · 입춘·절기 기준으로 세움</p>
@@ -318,14 +330,14 @@ function renderMe(panel) {
       ${mine ? `<div class="row" style="margin-top:16px"><button class="btn ghost" id="edit">내 정보 수정</button><button class="btn ghost" id="del">내 정보 삭제</button></div>` : ''}
     </section>
     <div id="editBox"></div>`;
-  panel.querySelector('#viewAs').addEventListener('change', (e) => { viewAs = e.target.value; renderRoom(); });
+  panel.querySelector('#viewAs')?.addEventListener('change', (e) => { viewAs = e.target.value; renderRoom(); });
   if (!mine) return;
   panel.querySelector('#edit').addEventListener('click', () => {
     const box = panel.querySelector('#editBox');
     box.innerHTML = `<section class="sheet"><h2>내 정보 수정</h2>${memberForm(me)}</section>`;
     bindForm(box, async (data) => {
       room = await api(`/api/rooms/${roomId}/members/${me.id}`, 'PUT', { ...data, token: store.get(roomId).token });
-      me = room.members.find((m) => m.id === me.id); pillarCacheBust(); stamped = false; toast('저장했어요'); renderRoom();
+      me = room.members.find((m) => m.id === me.id); stamped = false; toast('저장했어요'); renderRoom();
     });
     box.scrollIntoView({ behavior: 'smooth' });
   });
@@ -335,7 +347,6 @@ function renderMe(panel) {
     store.set(roomId, { owner: store.get(roomId).owner }); me = null; viewAs = null; renderRoom();
   });
 }
-const pillarCacheBust = () => {}; // 생년월일이 바뀌면 키가 달라지므로 캐시 무효화 불필요
 
 // ───────────────────────── 라우터 ─────────────────────────
 function route() {
