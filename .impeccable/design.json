@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-13T00:00:00+09:00",
+  "title": "Design System: 삼합궁합",
+  "extensions": {
+    "colorMeta": {
+      "accent": { "role": "primary", "displayName": "주사", "canonical": "#b8331f", "tonalRamp": ["oklch(18% 0.07 30)", "oklch(28% 0.11 30)", "oklch(38% 0.15 30)", "oklch(50% 0.18 30)", "oklch(62% 0.16 30)", "oklch(74% 0.11 30)", "oklch(86% 0.06 30)", "oklch(95% 0.02 30)"] },
+      "accent-strong": { "role": "primary", "displayName": "진한 주사", "canonical": "#9a2a18", "tonalRamp": ["oklch(18% 0.07 30)", "oklch(28% 0.11 30)", "oklch(38% 0.15 30)", "oklch(44% 0.16 30)", "oklch(58% 0.16 30)", "oklch(72% 0.11 30)", "oklch(85% 0.06 30)", "oklch(95% 0.02 30)"] },
+      "accent-weak": { "role": "primary", "displayName": "옅은 주사", "canonical": "rgba(184, 51, 31, .10)", "tonalRamp": ["oklch(18% 0.07 30)", "oklch(30% 0.11 30)", "oklch(44% 0.15 30)", "oklch(58% 0.16 30)", "oklch(70% 0.12 30)", "oklch(82% 0.07 30)", "oklch(90% 0.04 30)", "oklch(96% 0.015 30)"] },
+      "success": { "role": "secondary", "displayName": "길 초록", "canonical": "#3b6e4a", "tonalRamp": ["oklch(16% 0.04 155)", "oklch(26% 0.06 155)", "oklch(36% 0.07 155)", "oklch(48% 0.07 155)", "oklch(60% 0.08 155)", "oklch(72% 0.07 155)", "oklch(84% 0.05 155)", "oklch(95% 0.02 155)"] },
+      "rank-1": { "role": "secondary", "displayName": "왕관 금", "canonical": "#b8942a", "tonalRamp": ["oklch(18% 0.04 85)", "oklch(30% 0.07 85)", "oklch(42% 0.09 85)", "oklch(54% 0.11 85)", "oklch(67% 0.12 85)", "oklch(78% 0.1 85)", "oklch(88% 0.06 85)", "oklch(95% 0.03 85)"] },
+      "rank-2": { "role": "secondary", "displayName": "왕관 은", "canonical": "#8f9096", "tonalRamp": ["oklch(16% 0.005 260)", "oklch(28% 0.005 260)", "oklch(40% 0.005 260)", "oklch(52% 0.005 260)", "oklch(63% 0.005 260)", "oklch(75% 0.005 260)", "oklch(86% 0.004 260)", "oklch(95% 0.003 260)"] },
+      "rank-3": { "role": "secondary", "displayName": "왕관 동", "canonical": "#a9784a", "tonalRamp": ["oklch(16% 0.03 65)", "oklch(28% 0.05 65)", "oklch(40% 0.07 65)", "oklch(50% 0.08 65)", "oklch(60% 0.08 65)", "oklch(72% 0.07 65)", "oklch(85% 0.04 65)", "oklch(95% 0.02 65)"] },
+      "paper": { "role": "neutral", "displayName": "한지 바탕", "canonical": "#e9dfc4", "tonalRamp": ["oklch(16% 0.015 90)", "oklch(28% 0.02 90)", "oklch(40% 0.03 90)", "oklch(52% 0.035 90)", "oklch(66% 0.04 90)", "oklch(78% 0.04 90)", "oklch(90% 0.035 90)", "oklch(96% 0.02 90)"] },
+      "sheet": { "role": "neutral", "displayName": "종이 장", "canonical": "#f5eedb", "tonalRamp": ["oklch(16% 0.015 90)", "oklch(28% 0.02 90)", "oklch(40% 0.03 90)", "oklch(52% 0.035 90)", "oklch(66% 0.04 90)", "oklch(80% 0.04 90)", "oklch(90% 0.035 90)", "oklch(94.5% 0.025 90)"] },
+      "field": { "role": "neutral", "displayName": "입력 면", "canonical": "#fbf7ec", "tonalRamp": ["oklch(16% 0.015 90)", "oklch(28% 0.02 90)", "oklch(40% 0.03 90)", "oklch(52% 0.035 90)", "oklch(66% 0.04 90)", "oklch(80% 0.04 90)", "oklch(92% 0.03 90)", "oklch(97.5% 0.015 90)"] },
+      "sheet-2": { "role": "neutral", "displayName": "종이 2", "canonical": "#e6dcc0", "tonalRamp": ["oklch(16% 0.015 90)", "oklch(28% 0.02 90)", "oklch(40% 0.03 90)", "oklch(52% 0.035 90)", "oklch(66% 0.04 90)", "oklch(78% 0.04 90)", "oklch(89% 0.035 90)", "oklch(96% 0.02 90)"] },
+      "sheet-3": { "role": "neutral", "displayName": "종이 3 (지도 바탕)", "canonical": "#d9cdab", "tonalRamp": ["oklch(16% 0.015 90)", "oklch(28% 0.02 90)", "oklch(40% 0.03 90)", "oklch(52% 0.04 90)", "oklch(66% 0.045 90)", "oklch(84% 0.045 90)", "oklch(91% 0.03 90)", "oklch(96% 0.02 90)"] },
+      "ink": { "role": "neutral", "displayName": "먹", "canonical": "#2a211a", "tonalRamp": ["oklch(16% 0.015 60)", "oklch(24% 0.02 60)", "oklch(36% 0.025 60)", "oklch(48% 0.03 60)", "oklch(60% 0.03 60)", "oklch(72% 0.03 60)", "oklch(84% 0.025 60)", "oklch(95% 0.015 60)"] },
+      "ink-2": { "role": "neutral", "displayName": "옅은 먹", "canonical": "#6a5d4c", "tonalRamp": ["oklch(16% 0.015 70)", "oklch(26% 0.02 70)", "oklch(36% 0.025 70)", "oklch(47% 0.03 70)", "oklch(60% 0.03 70)", "oklch(72% 0.03 70)", "oklch(84% 0.025 70)", "oklch(95% 0.015 70)"] },
+      "line": { "role": "neutral", "displayName": "먹선", "canonical": "rgba(42, 33, 26, .22)", "tonalRamp": ["oklch(16% 0.015 60)", "oklch(28% 0.02 60)", "oklch(40% 0.025 60)", "oklch(52% 0.03 60)", "oklch(64% 0.03 60)", "oklch(76% 0.03 60)", "oklch(86% 0.025 60)", "oklch(95% 0.015 60)"] },
+      "line-strong": { "role": "neutral", "displayName": "진한 먹선", "canonical": "rgba(42, 33, 26, .45)", "tonalRamp": ["oklch(16% 0.015 60)", "oklch(28% 0.02 60)", "oklch(40% 0.025 60)", "oklch(52% 0.03 60)", "oklch(64% 0.03 60)", "oklch(76% 0.03 60)", "oklch(86% 0.025 60)", "oklch(95% 0.015 60)"] },
+      "map-dim": { "role": "neutral", "displayName": "지도 먹선", "canonical": "#7a6b55", "tonalRamp": ["oklch(16% 0.015 75)", "oklch(28% 0.02 75)", "oklch(40% 0.03 75)", "oklch(52% 0.035 75)", "oklch(64% 0.035 75)", "oklch(76% 0.03 75)", "oklch(86% 0.025 75)", "oklch(95% 0.015 75)"] },
+      "map-ring": { "role": "neutral", "displayName": "지도 링", "canonical": "#8a7c66", "tonalRamp": ["oklch(16% 0.015 75)", "oklch(28% 0.02 75)", "oklch(40% 0.03 75)", "oklch(58% 0.035 75)", "oklch(68% 0.035 75)", "oklch(78% 0.03 75)", "oklch(87% 0.025 75)", "oklch(95% 0.015 75)"] },
+      "map-flow": { "role": "primary", "displayName": "기운 (지도 흐름선)", "canonical": "#f1b3a5", "tonalRamp": ["oklch(18% 0.07 30)", "oklch(30% 0.11 30)", "oklch(44% 0.15 30)", "oklch(58% 0.16 30)", "oklch(70% 0.12 30)", "oklch(81% 0.08 30)", "oklch(90% 0.04 30)", "oklch(96% 0.015 30)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display (로고 도장)", "purpose": "홈 로고 '三合' 한 곳. 주사 바탕 위 종이색, -4° 회전." },
+      "headline": { "displayName": "Headline", "purpose": "홈 h1 28px. 방 화면 h1은 24px." },
+      "title": { "displayName": "Title", "purpose": "종이 장 안 h2. 베스트 매치 이름은 20px." },
+      "subtitle": { "displayName": "Subtitle", "purpose": "h3 16.5px, 탭 라벨 15.5px." },
+      "numeral": { "displayName": "Numeral (낙관·한자)", "purpose": "낙관 점수(-0.02em)와 사주 한자 기둥." },
+      "body": { "displayName": "Body", "purpose": "기본 문장 15px/1.55, tnum. 이름 600 16px, 이유 14px." },
+      "input": { "displayName": "Input", "purpose": "모든 입력·셀렉트 16px. iOS 확대 방지." },
+      "label": { "displayName": "Label", "purpose": "필드 이름, 알림, 토스트, 작은 버튼 600 14px." },
+      "caption": { "displayName": "Caption", "purpose": ".small, 범례, 막대 라벨, 보조 설명 13px." },
+      "chip": { "displayName": "Chip", "purpose": "칩, 기둥 라벨, 각주 12px." }
+    },
+    "shadows": [
+      { "name": "seal-ring", "value": "inset 0 0 0 2px var(--sheet), inset 0 0 0 4px var(--accent)", "purpose": "낙관·로고 도장 안쪽 이중 테. 바깥으로 번지지 않는다." },
+      { "name": "focus-halo", "value": "0 0 0 3px var(--accent-weak)", "purpose": "입력·셀렉트 포커스. 테두리는 --accent." },
+      { "name": "canvas-glow", "value": "shadowBlur 10 (선) / 24 (캐릭터), shadowColor #b8331f", "purpose": "유대 지도 캔버스에서 선택된 캐릭터와 75점 이상 선에만. DOM에는 없음." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(.2, .8, .2, 1)", "purpose": "모든 전환·낙관 모션의 이징." },
+      { "name": "transition-state", "value": "0.15s", "purpose": "배경·테두리·글자색·박스섀도 전환." },
+      { "name": "transition-press", "value": "0.1s", "purpose": "transform(scale .97~.995) 눌림." },
+      { "name": "chevron-turn", "value": "0.2s", "purpose": "순위 카드 펼침 쉐브론 180° 회전." },
+      { "name": "stamp", "value": "0.45s both; 0%: scale(2) rotate(-16deg) opacity 0 → 65%: scale(.96) rotate(-5deg) → 100%: scale(1) rotate(-7deg)", "purpose": "낙관이 한 번 찍히는 모션. 방 진입·시점 변경·저장 후 1회." },
+      { "name": "map-enter", "value": "700ms cubic ease-out, stagger 60ms", "purpose": "유대 지도 캐릭터 등장." },
+      { "name": "map-breathe", "value": "±1.6px sin/cos, 1100/1300ms 주기", "purpose": "지도 캐릭터 호흡. 끌 때·reduced-motion이면 정지." },
+      { "name": "map-flow", "value": "lineDash [5, 23], offset -(t/28) (선택 시 t/10)", "purpose": "75점 이상 선 위로 흐르는 기운." },
+      { "name": "reduced-motion", "value": "animation: none; transition: none", "purpose": "prefers-reduced-motion: reduce에서 전부 끔." }
+    ],
+    "breakpoints": [
+      { "name": "roomhead-compact", "value": "520px" },
+      { "name": "phone", "value": "420px" }
+    ],
+    "textures": [
+      { "name": "grain", "value": "SVG feTurbulence fractalNoise baseFrequency 0.9, 2 octaves, 240×240 tile, alpha .09", "purpose": "body와 지도 캔버스의 가는 입자." },
+      { "name": "fiber", "value": "SVG feTurbulence fractalNoise baseFrequency 0.012 0.35, 3 octaves, 520×260 tile, alpha .07", "purpose": "body의 가로로 긴 한지 섬유. 이미지 파일 없음." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "주사 바탕에 종이색 글자. 폼 제출·링크 공유.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">방 열고 링크 받기</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; height: 44px; padding: 0 20px; border: 1px solid transparent; font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif; font-weight: 600; font-size: 15px; line-height: 1; transition: background .15s cubic-bezier(.2,.8,.2,1), border-color .15s cubic-bezier(.2,.8,.2,1), transform .1s cubic-bezier(.2,.8,.2,1); } .ds-btn:active { transform: scale(.98); } .ds-btn:focus-visible { outline: 2px solid var(--accent, #b8331f); outline-offset: 2px; } .ds-btn-primary { background: var(--accent, #b8331f); color: var(--sheet, #f5eedb); } .ds-btn-primary:hover { background: var(--accent-strong, #9a2a18); } .ds-btn:disabled { opacity: .5; cursor: default; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "투명 바탕에 1px 먹선. 방 머리의 보조 행동.",
+      "html": "<button class=\"ds-btn ds-btn-ghost\">링크 공유</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; height: 44px; padding: 0 20px; border: 1px solid transparent; font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif; font-weight: 600; font-size: 15px; line-height: 1; transition: background .15s cubic-bezier(.2,.8,.2,1), border-color .15s cubic-bezier(.2,.8,.2,1), transform .1s cubic-bezier(.2,.8,.2,1); } .ds-btn:active { transform: scale(.98); } .ds-btn:focus-visible { outline: 2px solid var(--accent, #b8331f); outline-offset: 2px; } .ds-btn-ghost { background: transparent; border-color: var(--line-strong, rgba(42,33,26,.45)); color: var(--ink, #2a211a); } .ds-btn-ghost:hover { border-color: var(--ink, #2a211a); background: var(--sheet, #f5eedb); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "입력 면 바탕, 1px 먹선, 포커스 시 주사 테두리와 옅은 주사 할로.",
+      "html": "<label class=\"ds-field\"><span>방 이름</span><input class=\"ds-input\" type=\"text\" placeholder=\"예: 고3 7반 단톡방\"></label>",
+      "css": ".ds-field { display: block; font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif; color: var(--ink, #2a211a); } .ds-field > span { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; } .ds-input { width: 100%; height: 44px; padding: 0 12px; border: 1px solid var(--line-strong, rgba(42,33,26,.45)); border-radius: 4px; background: #fbf7ec; color: var(--ink, #2a211a); font: inherit; font-size: 16px; transition: border-color .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s cubic-bezier(.2,.8,.2,1); } .ds-input::placeholder { color: var(--ink-2, #6a5d4c); opacity: 1; } .ds-input:focus { border-color: var(--accent, #b8331f); box-shadow: 0 0 0 3px var(--accent-weak, rgba(184,51,31,.10)); outline: none; }"
+    },
+    {
+      "name": "Choice Tile",
+      "kind": "chip",
+      "refersTo": "tile",
+      "description": "혈액형·MBTI 선택 타일. aria-pressed=true면 주사로 뒤집힌다.",
+      "html": "<div class=\"ds-tiles\"><button class=\"ds-tile\" aria-pressed=\"true\">A</button><button class=\"ds-tile\">B</button><button class=\"ds-tile\">O</button><button class=\"ds-tile\">AB</button></div>",
+      "css": ".ds-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; } .ds-tile { height: 48px; border: 1px solid var(--line-strong, rgba(42,33,26,.45)); background: #fbf7ec; border-radius: 4px; cursor: pointer; font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif; font-weight: 600; font-size: 17px; color: var(--ink, #2a211a); text-align: center; transition: background .15s cubic-bezier(.2,.8,.2,1), border-color .15s cubic-bezier(.2,.8,.2,1), color .15s cubic-bezier(.2,.8,.2,1), transform .1s cubic-bezier(.2,.8,.2,1); } .ds-tile:hover { border-color: var(--ink, #2a211a); } .ds-tile:active { transform: scale(.97); } .ds-tile:focus-visible { outline: 2px solid var(--accent, #b8331f); outline-offset: 2px; } .ds-tile[aria-pressed=true] { background: var(--accent, #b8331f); color: var(--sheet, #f5eedb); border-color: var(--accent, #b8331f); }"
+    },
+    {
+      "name": "Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "이름 옆 혈액형·MBTI 알약.",
+      "html": "<span class=\"ds-chip\">A형</span> <span class=\"ds-chip\">ENFP</span>",
+      "css": ".ds-chip { display: inline-block; font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--sheet-2, #e6dcc0); color: var(--ink-2, #6a5d4c); white-space: nowrap; }"
+    },
+    {
+      "name": "Tabs",
+      "kind": "nav",
+      "refersTo": "tabs",
+      "description": "먹선 밑줄 위 명조 탭. 선택되면 주사 2px 밑줄.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button role=\"tab\" aria-selected=\"true\">순위</button><button role=\"tab\">유대 지도</button><button role=\"tab\">내 사주</button></div>",
+      "css": ".ds-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line-strong, rgba(42,33,26,.45)); } .ds-tabs button { background: none; border: 0; padding: 12px 12px; font-family: 'Noto Serif KR', 'Nanum Myeongjo', serif; font-weight: 700; font-size: 15.5px; color: var(--ink-2, #6a5d4c); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .15s cubic-bezier(.2,.8,.2,1), border-color .15s cubic-bezier(.2,.8,.2,1); } .ds-tabs button:hover { color: var(--ink, #2a211a); } .ds-tabs button:focus-visible { outline: 2px solid var(--accent, #b8331f); outline-offset: 2px; border-radius: 4px; } .ds-tabs button[aria-selected=true] { color: var(--ink, #2a211a); border-bottom-color: var(--accent, #b8331f); }"
+    },
+    {
+      "name": "Sheet",
+      "kind": "card",
+      "refersTo": "sheet",
+      "description": "종이 한 장. 그림자 없이 1px 먹선으로만 바탕과 구분.",
+      "html": "<section class=\"ds-sheet\"><h2>방 열기</h2><p>링크를 단톡방에 올리면 친구들이 들어와 순위가 생겨요.</p></section>",
+      "css": ".ds-sheet { background: var(--sheet, #f5eedb); color: var(--ink, #2a211a); border: 1px solid var(--line-strong, rgba(42,33,26,.45)); border-radius: 6px; padding: 24px 20px; font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif; font-size: 15px; line-height: 1.55; } .ds-sheet h2 { margin: 0 0 16px; font-family: 'Noto Serif KR', 'Nanum Myeongjo', serif; font-weight: 700; font-size: 21px; line-height: 1.25; letter-spacing: -.01em; } .ds-sheet p { margin: 0; }"
+    },
+    {
+      "name": "Rank Card",
+      "kind": "card",
+      "refersTo": "rank-card",
+      "description": "눌리는 순위 줄. 왕관/번호, 아바타 자리, 이름+칩, 점수, 쉐브론, 점수 트랙.",
+      "html": "<details class=\"ds-rank\"><summary><span class=\"ds-rank-badge ds-r1\"><svg viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M3 18h18v2H3v-2zm0-2 1.2-9 4.8 4 3-6 3 6 4.8-4L21 16H3z\"/></svg></span><span class=\"ds-rank-who\"><b>민지</b> <span class=\"ds-chip\">A형</span> <span class=\"ds-chip\">ENFP</span></span><span class=\"ds-rank-score\"><b>88</b><span>천생연분</span></span><span class=\"ds-rank-more\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 9l6 6 6-6\"/></svg></span><span class=\"ds-rank-track\"><i style=\"width:88%\"></i></span></summary><div class=\"ds-rank-detail\">혈액형 A·A 안정적인 조합 +8</div></details>",
+      "css": ".ds-rank { background: #fbf7ec; border: 1px solid var(--line-strong, rgba(42,33,26,.45)); border-radius: 6px; font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif; color: var(--ink, #2a211a); transition: border-color .15s cubic-bezier(.2,.8,.2,1), transform .1s cubic-bezier(.2,.8,.2,1); } .ds-rank:hover { border-color: var(--ink, #2a211a); } .ds-rank:active { transform: scale(.995); } .ds-rank summary { list-style: none; cursor: pointer; padding: 12px 12px 12px 8px; display: grid; grid-template-columns: 40px 1fr auto 22px; grid-template-rows: auto auto; column-gap: 12px; row-gap: 8px; align-items: center; border-radius: 6px; } .ds-rank summary::-webkit-details-marker { display: none; } .ds-rank summary:focus-visible { outline: 2px solid var(--accent, #b8331f); outline-offset: 2px; } .ds-rank[open] summary { border-bottom: 1px dashed var(--line, rgba(42,33,26,.22)); border-radius: 6px 6px 0 0; } .ds-rank-badge { grid-row: 1 / span 2; width: 40px; height: 40px; display: grid; place-items: center; font-weight: 700; font-size: 16px; color: var(--ink-2, #6a5d4c); border-radius: 50%; background: var(--sheet-2, #e6dcc0); } .ds-rank-badge.ds-r1 { background: transparent; color: var(--rank-1, #b8942a); } .ds-rank-badge svg { width: 36px; height: 36px; } .ds-rank-who { grid-column: 2; grid-row: 1; min-width: 0; } .ds-rank-who b { font-size: 16px; font-weight: 600; } .ds-chip { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--sheet-2, #e6dcc0); color: var(--ink-2, #6a5d4c); } .ds-rank-score { grid-column: 3; grid-row: 1; text-align: right; line-height: 1.1; } .ds-rank-score b { font-size: 22px; font-weight: 700; display: block; color: var(--accent, #b8331f); } .ds-rank-score span { font-size: 12px; color: var(--ink-2, #6a5d4c); } .ds-rank-more { grid-column: 4; grid-row: 1 / span 2; width: 22px; height: 22px; color: var(--ink-2, #6a5d4c); transition: transform .2s cubic-bezier(.2,.8,.2,1); } .ds-rank-more svg { width: 22px; height: 22px; } .ds-rank[open] .ds-rank-more { transform: rotate(180deg); color: var(--accent, #b8331f); } .ds-rank-track { grid-column: 2 / span 2; height: 6px; border-radius: 3px; background: var(--sheet-2, #e6dcc0); overflow: hidden; } .ds-rank-track i { display: block; height: 100%; background: var(--accent, #b8331f); border-radius: 3px; } .ds-rank-detail { padding: 12px 12px 16px; font-size: 14px; }"
+    },
+    {
+      "name": "Seal (낙관)",
+      "kind": "custom",
+      "refersTo": "seal",
+      "description": "베스트 매치 옆에 한 번 찍히는 빨간 도장. 안쪽 이중 테, -7° 회전, 종이색 명조 숫자.",
+      "html": "<div class=\"ds-best\"><div><div class=\"ds-best-label\">민지님과 가장 잘 맞는 사람</div><div class=\"ds-best-name\">준호</div><div class=\"ds-best-sub\">천생연분 · 혈액형 20 · MBTI 30</div></div><span class=\"ds-seal ds-stamp\">88</span></div>",
+      "css": ".ds-best { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 6px; background: var(--accent-weak, rgba(184,51,31,.10)); font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif; color: var(--ink, #2a211a); } .ds-best-label, .ds-best-sub { font-size: 13px; color: var(--ink-2, #6a5d4c); } .ds-best-name { font-size: 20px; font-weight: 700; font-family: 'Noto Serif KR', 'Nanum Myeongjo', serif; } .ds-seal { width: 68px; height: 68px; border-radius: 7px; background: var(--accent, #b8331f); color: var(--sheet, #f5eedb); flex: none; margin-left: auto; display: grid; place-items: center; font-family: 'Noto Serif KR', 'Nanum Myeongjo', serif; font-weight: 700; font-size: 30px; line-height: 1; letter-spacing: -.02em; transform: rotate(-7deg); box-shadow: inset 0 0 0 2px var(--sheet, #f5eedb), inset 0 0 0 4px var(--accent, #b8331f); } .ds-stamp { animation: ds-stamp .45s cubic-bezier(.2,.8,.2,1) both; } @keyframes ds-stamp { 0% { transform: scale(2) rotate(-16deg); opacity: 0; } 65% { transform: scale(.96) rotate(-5deg); opacity: 1; } 100% { transform: scale(1) rotate(-7deg); opacity: 1; } } @media (prefers-reduced-motion: reduce) { .ds-stamp { animation: none; } }"
+    },
+    {
+      "name": "Toast",
+      "kind": "custom",
+      "refersTo": "toast",
+      "description": "먹 바탕에 종이색 글자. 화면 아래 고정, 평평한 띠.",
+      "html": "<div class=\"ds-toast\">링크를 복사했어요</div>",
+      "css": ".ds-toast { display: inline-block; background: var(--ink, #2a211a); color: var(--sheet, #f5eedb); padding: 12px 20px; border-radius: 4px; font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif; font-size: 14px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "한지 위 먹과 주사(朱砂)",
+    "overview": "예전 궁합책을 펼친 한 장의 한지다. 화면 전체가 누런 한지 한 장이고, 그 위에 한 톤 밝은 종이 장이 1px 먹선으로만 구분되어 얹힌다. 카드가 그림자로 떠 있는 '앱 UI' 배치를 거부한다. 글은 먹으로 적히고, 점수와 강조는 주사 빨강 하나로만 찍힌다. 가장 잘 맞는 사람 옆에는 네모난 빨간 낙관이 한 번 쾅 찍히고, 유대 지도에서는 같은 종이 결 위에 먹선으로 인연이 이어진다.\n\n밀도는 폰 한 손 기준이다. 600px 한 열, 44~48px 높이의 입력과 버튼, 16px 기본 입력 글자. 장식은 종이 질감(SVG 섬유 결 + 입자) 외에는 더하지 않는다. 명조는 제목·숫자 도장·한자 기둥에만 쓰고, 본문과 데이터는 산세리프가 맡는다. 2026-10-13에 '밤하늘 + 한지 카드' 세계는 사용자가 \"AI 같다\"고 거부했고, 이 세계가 그 자리를 대신한다.",
+    "keyCharacteristics": [
+      "바탕과 종이 장 모두 질감 있는 한지, 떠 있는 카드와 드롭 섀도 없음",
+      "포인트 컬러는 주사 빨강 하나; 길(+) 이유에만 초록 하나를 보조로 허용",
+      "제목은 Noto Serif KR 700(로고만 900), 본문·데이터는 Pretendard 15px, tabular numerals",
+      "모서리는 6px/4px, 칩은 알약, 배지는 원",
+      "한 번 찍히는 낙관 모션과 살아 있는 유대 지도가 유일한 서명 모션"
+    ],
+    "rules": [
+      { "name": "The One Vermilion Rule", "body": "색으로 강조하는 자리는 주사 하나다. 두 번째 포인트 컬러는 없다. 초록은 '+' 숫자에만, 금·은·동은 왕관에만 허용되는 예외이며 둘 다 글자·배경으로 번지지 않는다.", "section": "colors" },
+      { "name": "The Ink Outline Rule", "body": "면을 구분하는 것은 1px 먹선(line-strong)이지 그림자나 색 차이가 아니다. 종이 단계(paper → sheet → field)는 한 톤씩만 밝아진다.", "section": "colors" },
+      { "name": "The Serif-Only-For-Titles Rule", "body": "명조는 제목·탭·낙관·한자에만. 문장 본문, 폼, 데이터, 캔버스 라벨(13px Pretendard)은 산세리프다. 대문자 트래킹 소제목(아이브로) 없음.", "section": "typography" },
+      { "name": "The No-Lift Rule", "body": "어떤 면도 드롭 섀도로 떠오르지 않는다. 그림자처럼 보이는 것은 도장 안쪽 테, 포커스 할로, 지도 캔버스의 기운뿐이다.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do 모든 면을 1px 진한 먹선(line-strong)으로 구분하고, 호버는 테두리를 먹색으로만 바꾼다.",
+      "Do 새 강조는 주사 하나로만 찍는다: 바탕이면 종이색 글자, 글자면 먹 위 주사.",
+      "Do 명조는 Noto Serif KR 700으로 제목·탭·낙관·한자에만, 본문·폼·데이터는 Pretendard 15px(tnum)로 쓴다.",
+      "Do 입력·버튼은 44px(전체 폭 48px, 작은 36px), 입력 글자 16px, 모서리 4px을 지킨다.",
+      "Do 누르는 면은 입력 면(field) 바탕으로 한 톤 밝히고, 눌림은 scale(.97~.995) 0.1s로 표현한다.",
+      "Do 모션은 0.15s cubic-bezier(.2,.8,.2,1) 전환과 한 번 찍히는 낙관, 지도의 호흡만 두고, prefers-reduced-motion을 존중한다.",
+      "Do 아이콘은 인라인 SVG(왕관·쉐브론·아바타)로 currentColor를 쓴다."
+    ],
+    "donts": [
+      "Don't 드롭 섀도·블러·반투명 유리·그라데이션으로 면을 띄우지 않는다. 떠오르는 카드는 이 세계에 없다.",
+      "Don't 주사 외의 두 번째 포인트 컬러를 들이지 않는다. 초록은 '+' 숫자, 금·은·동은 왕관 밖으로 나가지 않는다.",
+      "Don't 종이 질감 외의 장식(별, 밤하늘, 일러스트 배경, 패턴 테두리)을 더하지 않는다.",
+      "Don't 본문 문장·폼·숫자 데이터에 명조를 쓰지 않는다. 대문자 트래킹 아이브로 소제목을 만들지 않는다.",
+      "Don't 6px·4px·알약·원 외의 모서리나 1px 외의 테두리 두께를 쓰지 않는다(낙관 7px은 도장 전용).",
+      "Don't 600px 한 열을 넘는 다열 레이아웃이나 폰 폭 320px에서 가로 스크롤을 만드는 고정 폭을 쓰지 않는다."
+    ]
+  }
+}

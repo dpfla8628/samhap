@@ -38,7 +38,7 @@ const FOOT = `<p class="footnote">혈액형·MBTI·사주 궁합은 과학적 �
 function renderHome() {
   $app.innerHTML = `
     <header class="masthead"><span class="logo">三合</span><h1>삼합궁합</h1><p class="tagline">혈액형 · MBTI · 사주, 셋을 합쳐 본 우리 방 궁합</p></header>
-    <section class="sheet talisman">
+    <section class="sheet">
       <h2>방 열기</h2>
       <form id="create">
         <label class="field"><span>방 이름</span><input type="text" name="name" maxlength="30" placeholder="예: 고3 7반 단톡방" required></label>
@@ -158,13 +158,13 @@ function shareLink() {
 function renderRoom() {
   const head = `
     <header class="roomhead">
-      <div><a href="/" class="crumb">三合 삼합궁합</a><h1>${esc(room.name)}</h1><span class="progress">${room.members.length}/${room.size}명 입력</span></div>
+      <div><h1>${esc(room.name)}</h1><span class="progress">${room.members.length}/${room.size}명 입력 · <a href="/" class="crumb">삼합궁합 홈으로</a></span></div>
       <div class="actions"><a class="btn ghost" href="/">새 방 만들기</a><button class="btn primary" id="share">링크 공유</button></div>
     </header>`;
   if (!me) {
     const remembered = profile.get();
     $app.innerHTML = head + `
-      <section class="sheet talisman"><h2>내 정보 넣기</h2>${remembered ? '<p class="muted small" style="margin:-8px 0 16px">지난번에 넣은 정보를 불러왔어요. 바뀐 게 있으면 고치고 저장하세요.</p>' : ''}${memberForm(remembered || {})}</section>
+      <section class="sheet"><h2>내 정보 넣기</h2>${remembered ? '<p class="muted small" style="margin:-8px 0 16px">지난번에 넣은 정보를 불러왔어요. 바뀐 게 있으면 고치고 저장하세요.</p>' : ''}${memberForm(remembered || {})}</section>
       ${room.members.length ? `<section class="sheet"><h3 style="margin-top:0">먼저 들어온 사람</h3><p>${room.members.map((m) => esc(m.name)).join(', ')}</p>
         <p class="muted small">입력 없이 구경만 하려면 <a href="#" id="peek">여기</a>를 눌러요.</p></section>` : ''}
       ${FOOT}`;
@@ -214,13 +214,14 @@ function renderRank(panel, others) {
         <span class="seal ${doStamp ? 'stamp' : ''}" aria-label="${rows[0].c.total}점">${rows[0].c.total}</span>
       </div>
       <h2 style="margin-bottom:4px">잘 맞는 순서</h2>
-      <p class="muted small" style="margin-bottom:8px">혈액형 25% + MBTI 35% + 사주 40%. 이름을 누르면 이유가 펼쳐져요.</p>
+      <p class="muted small" style="margin-bottom:12px">혈액형 25% + MBTI 35% + 사주 40%. 각 줄을 누르면 왜 그런지 펼쳐져요.</p>
       <ol class="rank">${rows.map(({ m, c }, i) => `
         <li><details>
           <summary>
             ${badge(i + 1)}
             <span class="who">${avatarSVG(pillarsOf(m).day[1], 36)}<span class="who-text"><b>${esc(m.name)}</b><span class="chips"><span class="chip">${m.blood}형</span><span class="chip">${m.mbti}</span><span class="chip">${ganji(pillarsOf(m).day)}일주</span></span></span></span>
             <span class="score"><b>${c.total}</b><span>${c.grade}</span></span>
+            <span class="more" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
             <span class="track"><i style="width:${c.total}%;animation-delay:${i * 60}ms"></i></span>
           </summary>
           <div class="detail">
@@ -253,9 +254,9 @@ function renderMap(panel) {
     <canvas class="sky" id="sky" aria-label="방 전체 궁합 유대 지도"></canvas>
     <div class="legend">
       <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#b8331f" stroke-width="3"/></svg>75점 이상</span>
-      <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#8e8676" stroke-width="2"/></svg>60~74</span>
-      <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#8e8676" stroke-width="1"/></svg>45~59</span>
-      <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#8e8676" stroke-width="1" stroke-dasharray="4 4"/></svg>45점 미만</span>
+      <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#7a6b55" stroke-width="2"/></svg>60~74</span>
+      <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#7a6b55" stroke-width="1"/></svg>45~59</span>
+      <span><svg width="24" height="6" aria-hidden="true"><line x1="0" y1="3" x2="24" y2="3" stroke="#7a6b55" stroke-width="1" stroke-dasharray="4 4"/></svg>45점 미만</span>
     </div>
     <p class="muted small" style="margin:12px 0 0">캐릭터는 각자의 일지 동물이에요. 누르면 그 사람과 모두의 궁합이 보이고, 끌어서 옮길 수 있어요. 가까이 모일수록 잘 맞는 무리예요.</p>
     <div id="pick">${ms.length < 2 ? '<p class="muted small">두 명 이상 모이면 별자리가 이어져요.</p>' : ''}</div></section>`;
@@ -265,7 +266,7 @@ function renderMap(panel) {
   canvas.width = W * dpr; canvas.height = H * dpr;
   const ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const ACCENT = '#b8331f', PAPER = '#f1ece2', DIM = '#8e8676', INK = '#17141d';
+  const ACCENT = '#b8331f', LABEL = '#2a211a', DIM = '#7a6b55', HALO = '#d9cdab'; // 한지 바탕 위 먹선
   const FONT = (w) => `${w} 13px "Pretendard Variable", Pretendard, sans-serif`;
 
   const n = ms.length;
@@ -323,15 +324,15 @@ function renderMap(panel) {
       ctx.beginPath(); ctx.moveTo(pos[i].x, pos[i].y); ctx.lineTo(pos[j].x, pos[j].y); ctx.stroke();
       ctx.shadowBlur = 0;
       if (s >= 75 && !reduce) { // 강한 인연: 굵은 선 위로 밝은 기운이 흐른다
-        ctx.strokeStyle = '#f3c9bf'; ctx.lineWidth = 2; ctx.setLineDash([5, 23]); ctx.lineDashOffset = -(t / (sel ? 10 : 28)) % 28;
+        ctx.strokeStyle = '#f1b3a5'; ctx.lineWidth = 2; ctx.setLineDash([5, 23]); ctx.lineDashOffset = -(t / (sel ? 10 : 28)) % 28;
         ctx.beginPath(); ctx.moveTo(pos[i].x, pos[i].y); ctx.lineTo(pos[j].x, pos[j].y); ctx.stroke();
         ctx.setLineDash([]);
       }
       if (sel) {
         ctx.setLineDash([]); ctx.globalAlpha = 1; ctx.font = FONT(700); ctx.textAlign = 'center';
         const mx = (pos[i].x + pos[j].x) / 2, my = (pos[i].y + pos[j].y) / 2;
-        ctx.lineWidth = 5; ctx.strokeStyle = INK; ctx.strokeText(String(s), mx, my + 4);
-        ctx.fillStyle = s >= 75 ? '#f0b7ab' : PAPER; ctx.fillText(String(s), mx, my + 4);
+        ctx.lineWidth = 5; ctx.strokeStyle = HALO; ctx.strokeText(String(s), mx, my + 4);
+        ctx.fillStyle = s >= 75 ? ACCENT : LABEL; ctx.fillText(String(s), mx, my + 4);
       }
     }
     ctx.setLineDash([]); ctx.globalAlpha = 1;
@@ -340,12 +341,12 @@ function renderMap(panel) {
       const r = (isSel ? 27 : 22) * (0.4 + 0.6 * q.s);
       ctx.globalAlpha = selected === null || isSel ? 1 : 0.35;
       if (isSel) { ctx.shadowColor = ACCENT; ctx.shadowBlur = 24; }
-      drawAvatar(ctx, p.ji, q.x, q.y, r, { ring: isMe || isSel ? ACCENT : '#cfc6b5', ringWidth: isMe || isSel ? 3 : 1.5 });
+      drawAvatar(ctx, p.ji, q.x, q.y, r, { ring: isMe || isSel ? ACCENT : '#8a7c66', ringWidth: isMe || isSel ? 3 : 1.5 });
       ctx.shadowBlur = 0;
       const label = p.m.name + (isMe ? ' (나)' : '');
       ctx.font = FONT(isMe || isSel ? 700 : 500); ctx.textAlign = 'center'; ctx.lineJoin = 'round';
-      ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.strokeText(label, q.x, q.y + r + 16);
-      ctx.fillStyle = PAPER; ctx.fillText(label, q.x, q.y + r + 16);
+      ctx.lineWidth = 4; ctx.strokeStyle = HALO; ctx.strokeText(label, q.x, q.y + r + 16);
+      ctx.fillStyle = LABEL; ctx.fillText(label, q.x, q.y + r + 16);
     });
     ctx.globalAlpha = 1;
   }
@@ -398,7 +399,7 @@ function renderMe(panel) {
     : `<div class="pillar"><div class="lbl">${label}</div><div class="han muted">?<br>?</div><div class="kor muted">생시 모름</div></div>`;
   const mine = target.id === me?.id;
   panel.innerHTML = `
-    <section class="sheet talisman">
+    <section class="sheet">
       ${perspective()}
       <div class="me-head">${avatarSVG(p.day[1], 56)}<div><h2>${esc(target.name)}의 사주</h2><div class="muted small">일지가 ${JI[p.day[1]]}(${JI_HAN[p.day[1]]})라서 ${JI_ANIMAL[p.day[1]]} 캐릭터예요</div></div></div>
       <div class="pillars">${col('시주', p.hour)}${col('일주', p.day, true)}${col('월주', p.month)}${col('년주', p.year)}</div>
